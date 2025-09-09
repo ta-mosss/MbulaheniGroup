@@ -1,16 +1,13 @@
 <!DOCTYPE html>
 <html>
  <head>
-  <!-- Site made with Mobirise Website Builder v5.9.18, https://mobirise.com -->
   <meta charset="utf-8"/>
   <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
   <meta content="Mobirise v5.9.18, mobirise.com" name="generator"/>
   <meta content="width=device-width, initial-scale=1, minimum-scale=1" name="viewport"/>
   <link href="assets/images/mockup-5-128x95-1.png" rel="shortcut icon" type="image/x-icon"/>
   <meta content="Reliable fuel supply services for businesses and fleet operations across multiple provinces." name="description"/>
-  <title>
-   Fuel Supply Services | Mbulaheni Group
-  </title>
+  <title>Fuel Supply Services | Mbulaheni Group</title>
   <link href="assets/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
   <link href="assets/bootstrap/css/bootstrap-grid.min.css" rel="stylesheet"/>
   <link href="assets/bootstrap/css/bootstrap-reboot.min.css" rel="stylesheet"/>
@@ -31,6 +28,58 @@
   <meta content="https://mbulahenigroup.co.za/Mbulahenigroup-Fuel.html" property="og:url"/>
   <meta content="https://mbulahenigroup.co.za/assets/images/og-image.jpg" property="og:image"/>
   <meta content="summary_large_image" name="twitter:card"/>
+  <style>
+    .hero-section {
+      background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('assets/images/fuel-hero.jpg') center/cover no-repeat;
+      color: white;
+      padding: 120px 0;
+      text-align: center;
+    }
+    .service-card {
+      transition: transform 0.3s ease;
+      height: 100%;
+      border: none;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .service-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    }
+    .benefits-list {
+      list-style-type: none;
+      padding-left: 0;
+    }
+    .benefits-list li {
+      padding: 8px 0;
+      border-bottom: 1px solid #f1f1f1;
+    }
+    .benefits-list li:before {
+      content: "✓";
+      color: #28a745;
+      margin-right: 10px;
+      font-weight: bold;
+    }
+    .cta-section {
+      background-color: #f8f9fa;
+      padding: 60px 0;
+    }
+    .fuel-icon {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+      color: #e6c63b;
+    }
+    .coverage-badge {
+      display: inline-block;
+      background: #e6c63b;
+      color: #000;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-weight: bold;
+      margin: 5px;
+    }
+  </style>
  </head>
  <body>
   <section class="menu menu1 cid-uA8dvnGYHx" data-bs-version="5.1" id="menu1-d" once="menu">
@@ -45,14 +94,10 @@
      </div>
      <button aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarSupportedContent" data-bs-toggle="collapse" data-target="#navbarSupportedContent" data-toggle="collapse" type="button">
       <div class="hamburger">
-       <span>
-       </span>
-       <span>
-       </span>
-       <span>
-       </span>
-       <span>
-       </span>
+       <span></span>
+       <span></span>
+       <span></span>
+       <span></span>
       </div>
      </button>
      <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -77,151 +122,283 @@
     </div>
    </nav>
   </section>
-  <section class="header4 cid-uA8dvokzTS mbr-fullscreen mbr-parallax-background" data-bs-version="5.1" id="header4-e">
-   <div class="container">
-    <div class="row">
-     <div class="content-wrap">
-     </div>
+
+  <section class="hero-section">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-10">
+          <h1 class="display-2 mb-4">Reliable Fuel Supply Solutions</h1>
+          <p class="lead mb-4">Delivering quality fuel products and management services to businesses across South Africa</p>
+          <div class="mb-4">
+            <span class="coverage-badge">Gauteng</span>
+            <span class="coverage-badge">Western Cape</span>
+            <span class="coverage-badge">KwaZulu-Natal</span>
+            <span class="coverage-badge">Eastern Cape</span>
+            <span class="coverage-badge">Free State</span>
+          </div>
+          <a href="#form5-h" class="btn btn-primary btn-lg display-7">Request Fuel Supply</a>
+        </div>
+      </div>
     </div>
-   </div>
   </section>
+
+  <section class="container my-5 py-5">
+    <div class="row justify-content-center">
+      <div class="col-md-10 text-center">
+        <h2 class="display-3 mb-4">Our Fuel Supply Services</h2>
+        <p class="lead">We provide comprehensive fuel solutions designed to keep your operations running smoothly and efficiently.</p>
+      </div>
+    </div>
+    <div class="row mt-5">
+      <div class="col-md-4 mb-4">
+        <div class="card service-card h-100 text-center p-4">
+          <div class="fuel-icon">⛽</div>
+          <div class="card-body">
+            <h4 class="card-title">Bulk Fuel Delivery</h4>
+            <p class="card-text">Regular scheduled deliveries to keep your operations running without interruption.</p>
+            <ul class="benefits-list text-start">
+              <li>Diesel & Petrol supply</li>
+              <li>Scheduled deliveries</li>
+              <li>On-site storage solutions</li>
+              <li>Volume discount programs</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="card service-card h-100 text-center p-4">
+          <div class="fuel-icon">🚚</div>
+          <div class="card-body">
+            <h4 class="card-title">Fleet Management</h4>
+            <p class="card-text">Comprehensive fuel management solutions for vehicle fleets of all sizes.</p>
+            <ul class="benefits-list text-start">
+              <li>Fuel card programs</li>
+              <li>Consumption monitoring</li>
+              <li>Route optimization</li>
+              <li>Maintenance scheduling</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="card service-card h-100 text-center p-4">
+          <div class="fuel-icon">🔄</div>
+          <div class="card-body">
+            <h4 class="card-title">Emergency Supply</h4>
+            <p class="card-text">24/7 emergency fuel supply services when unexpected needs arise.</p>
+            <ul class="benefits-list text-start">
+              <li>24/7 availability</li>
+              <li>Rapid response teams</li>
+              <li>Emergency planning</li>
+              <li>Backup supply solutions</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="features3 cid-uA8dvoMh0U" data-bs-version="5.1" id="features3-f">
-   <div class="mbr-overlay">
-   </div>
+   <div class="mbr-overlay"></div>
    <div class="container">
     <div class="mbr-section-head">
      <h4 class="mbr-section-title mbr-fonts-style align-center mb-0 display-2">
-      <strong>
-       Reliable fuel supply services for businesses and fleet operations across multiple provinces
-      </strong>
+      <strong>Quality Fuel Products & Services</strong>
      </h4>
+     <p class="mbr-section-subtitle mbr-fonts-style align-center mb-4 mt-2 display-7">
+      We maintain the highest standards in fuel quality and service delivery
+     </p>
     </div>
     <div class="row mt-4">
      <div class="item features-image сol-12 col-md-6 col-lg-6 active">
       <div class="item-wrapper">
        <div class="item-img">
-        <img alt="Mbulaheni Group" data-bs-slide-to="0" data-slide-to="0" src="assets/images/mbr-1076x717.webp"/>
+        <img alt="Fleet Management" data-bs-slide-to="0" data-slide-to="0" src="assets/images/mbr-1076x717.webp"/>
        </div>
        <div class="item-content">
         <h5 class="item-title mbr-fonts-style display-7">
-         <strong>
-          Fleet Management
-         </strong>
+         <strong>Fleet Management</strong>
         </h5>
         <p class="mbr-text mbr-fonts-style mt-3 display-7">
          Comprehensive fuel management solutions for vehicle fleets
         </p>
+        <ul class="benefits-list">
+          <li>Customized fuel management programs</li>
+          <li>Real-time consumption tracking</li>
+          <li>Cost optimization strategies</li>
+          <li>Detailed reporting and analytics</li>
+        </ul>
        </div>
       </div>
      </div>
      <div class="item features-image сol-12 col-md-6 col-lg-6">
       <div class="item-wrapper">
        <div class="item-img">
-        <img alt="Mbulaheni Group" data-bs-slide-to="1" data-slide-to="1" src="assets/images/mbr-1076x512.webp"/>
+        <img alt="Bulk Fuel Delivery" data-bs-slide-to="1" data-slide-to="1" src="assets/images/mbr-1076x512.webp"/>
        </div>
        <div class="item-content">
         <h5 class="item-title mbr-fonts-style display-7">
-         <strong>
-          Bulk Fuel Delivery
-         </strong>
+         <strong>Bulk Fuel Delivery</strong>
         </h5>
         <p class="mbr-text mbr-fonts-style mt-3 display-7">
          Regular bulk fuel delivery services for businesses and industries
         </p>
+        <ul class="benefits-list">
+          <li>Flexible delivery schedules</li>
+          <li>Various tanker sizes available</li>
+          <li>On-site fuel storage solutions</li>
+          <li>Safety-compliant transportation</li>
+        </ul>
        </div>
       </div>
      </div>
     </div>
    </div>
   </section>
+
   <section class="features3 cid-uA8guSyXMa" data-bs-version="5.1" id="features3-j">
-   <div class="mbr-overlay">
-   </div>
+   <div class="mbr-overlay"></div>
    <div class="container">
     <div class="row mt-4">
      <div class="item features-image сol-12 col-md-6 col-lg-6 active">
       <div class="item-wrapper">
        <div class="item-img">
-        <img alt="Mbulaheni Group" data-bs-slide-to="0" data-slide-to="0" src="assets/images/mbr-1-1076x717.webp"/>
+        <img alt="Quality Assurance" data-bs-slide-to="0" data-slide-to="0" src="assets/images/mbr-1-1076x717.webp"/>
        </div>
        <div class="item-content">
         <h5 class="item-title mbr-fonts-style display-7">
-         <strong>
-          Quality
-         </strong>
-         <span style="font-size: 17.6px;">
-          <strong>
-           Assurance
-          </strong>
-         </span>
+         <strong>Quality Assurance</strong>
         </h5>
         <p class="mbr-text mbr-fonts-style mt-3 display-7">
          Strict quality control measures for all fuel products
         </p>
+        <ul class="benefits-list">
+          <li>Regular quality testing</li>
+          <li>Certified fuel products</li>
+          <li>Contamination prevention</li>
+          <li>Compliance with SABS standards</li>
+        </ul>
        </div>
       </div>
      </div>
      <div class="item features-image сol-12 col-md-6 col-lg-6">
       <div class="item-wrapper">
        <div class="item-img">
-        <img alt="Mbulaheni Group" data-bs-slide-to="1" data-slide-to="1" src="assets/images/mbr-1076x715.webp"/>
+        <img alt="Emergency Supply" data-bs-slide-to="1" data-slide-to="1" src="assets/images/mbr-1076x715.webp"/>
        </div>
        <div class="item-content">
         <h5 class="item-title mbr-fonts-style display-7">
-         <strong>
-          Emergency Supply
-         </strong>
+         <strong>Emergency Supply</strong>
         </h5>
         <p class="mbr-text mbr-fonts-style mt-3 display-7">
          24/7 emergency fuel supply services when you need it most
         </p>
+        <ul class="benefits-list">
+          <li>Rapid response teams</li>
+          <li>Emergency hotline</li>
+          <li>After-hours delivery</li>
+          <li>Disaster recovery support</li>
+        </ul>
        </div>
       </div>
      </div>
     </div>
    </div>
   </section>
+
+  <section class="container my-5 py-5">
+    <div class="row justify-content-center">
+      <div class="col-md-10 text-center">
+        <h2 class="display-3 mb-4">Our Fuel Products</h2>
+        <p class="lead">We supply a comprehensive range of quality fuel products for various applications</p>
+      </div>
+    </div>
+    <div class="row mt-5">
+      <div class="col-md-3 col-6 text-center mb-4">
+        <div class="fuel-icon">🛢️</div>
+        <h5>Diesel</h5>
+        <p>50ppm & 500ppm variants</p>
+      </div>
+      <div class="col-md-3 col-6 text-center mb-4">
+        <div class="fuel-icon">⛽</div>
+        <h5>Petrol</h5>
+        <p>93 & 95 octane grades</p>
+      </div>
+      <div class="col-md-3 col-6 text-center mb-4">
+        <div class="fuel-icon">🔥</div>
+        <h5>Paraffin</h5>
+        <p>Industrial and domestic grades</p>
+      </div>
+      <div class="col-md-3 col-6 text-center mb-4">
+        <div class="fuel-icon">🛢️</div>
+        <h5>Lubricants</h5>
+        <p>Engine oils and greases</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <div class="container text-center">
+      <h2 class="display-4 mb-4">Keep Your Operations Running</h2>
+      <p class="lead mb-4">Reliable fuel supply is critical for business continuity. Let us handle your fuel needs.</p>
+      <a href="#form5-h" class="btn btn-primary btn-lg display-7">Request a Quote</a>
+    </div>
+  </section>
+
   <section class="form5 cid-uA8dvpZzmH" data-bs-version="5.1" id="form5-h">
-   <div class="mbr-overlay">
-   </div>
+   <div class="mbr-overlay"></div>
    <div class="container-fluid">
     <div class="mbr-section-head">
      <h3 class="mbr-section-title mbr-fonts-style align-center mb-0 display-2">
-      <strong>
-       <br/>
-      </strong>
-      <br/>
-      <strong>
-       Contacts Us
-      </strong>
+      <strong>Contact Us</strong>
      </h3>
+     <p class="mbr-section-subtitle mbr-fonts-style align-center mb-4 mt-2 display-7">
+      Discuss your fuel supply requirements with our experts
+     </p>
     </div>
     <div class="row justify-content-center mt-4">
      <div class="col-lg-8 mx-auto mbr-form" data-form-type="formoid">
-      <form action="https://mobirise.eu/" class="mbr-form form-with-styler" data-form-title="Form Name" method="POST">
-       <input data-form-email="true" name="email" type="hidden" value="49yG2EyFgNv8DyS04xv5Ycswg9Uxvy+5j/UCbjIkffAs1JfjKmcuivd5MRiwT8MLm+geXBru1GGsel7e+qeDPTHLCXnZQDlMhe5KbM+Omo/NcFgs3bLK8bjVM7evMIED"/>
+      <form action="https://formsubmit.co/your-email@mbulahenigroup.co.za" method="POST" class="mbr-form form-with-styler" data-form-title="Fuel Inquiry Form">
+       <input type="hidden" name="_subject" value="New Fuel Supply Inquiry">
+       <input type="hidden" name="_template" value="table">
+       <input type="hidden" name="_captcha" value="false">
+       <input type="hidden" name="_next" value="https://mbulahenigroup.co.za/thank-you.html">
        <div class="row">
-        <div class="alert alert-success col-12" data-form-alert="" hidden="hidden">
-         Thanks for filling out the form!
+        <div class="col-md-6 col-sm-12 form-group mb-3" data-for="name">
+         <input type="text" class="form-control" name="name" data-form-field="name" id="name-form5-h" placeholder="Your Name" required="">
         </div>
-        <div class="alert alert-danger col-12" data-form-alert-danger="" hidden="hidden">
-         Oops...! some problem!
+        <div class="col-md-6 col-sm-12 form-group mb-3" data-for="email">
+         <input type="email" class="form-control" name="email" data-form-field="email" id="email-form5-h" placeholder="Your Email" required="">
         </div>
-       </div>
-       <div class="dragArea row">
-        <div class="col-md col-sm-12 form-group mb-3" data-for="name">
-         <input class="form-control" data-form-field="name" id="name-form5-h" name="name" placeholder="Name" type="text" value=""/>
+        <div class="col-md-6 col-sm-12 form-group mb-3" data-for="company">
+         <input type="text" class="form-control" name="company" data-form-field="company" id="company-form5-h" placeholder="Company Name">
         </div>
-        <div class="col-md col-sm-12 form-group mb-3" data-for="email">
-         <input class="form-control" data-form-field="email" id="email-form5-h" name="email" placeholder="E-mail" type="email" value=""/>
+        <div class="col-md-6 col-sm-12 form-group mb-3" data-for="phone">
+         <input type="tel" class="form-control" name="phone" data-form-field="phone" id="phone-form5-h" placeholder="Phone Number">
         </div>
-        <div class="col-12 form-group mb-3" data-for="textarea">
-         <textarea class="form-control" data-form-field="textarea" id="textarea-form5-h" name="textarea" placeholder="Message"></textarea>
+        <div class="col-md-6 col-sm-12 form-group mb-3" data-for="fuel-type">
+         <select class="form-control" name="fuel-type" id="fuel-type-form5-h">
+           <option value="">Fuel Type Needed</option>
+           <option value="Diesel">Diesel</option>
+           <option value="Petrol">Petrol</option>
+           <option value="Paraffin">Paraffin</option>
+           <option value="Lubricants">Lubricants</option>
+         </select>
+        </div>
+        <div class="col-md-6 col-sm-12 form-group mb-3" data-for="service-type">
+         <select class="form-control" name="service-type" id="service-type-form5-h">
+           <option value="">Service Type</option>
+           <option value="Bulk Delivery">Bulk Delivery</option>
+           <option value="Fleet Management">Fleet Management</option>
+           <option value="Emergency Supply">Emergency Supply</option>
+           <option value="Consultation">Consultation</option>
+         </select>
+        </div>
+        <div class="col-12 form-group mb-3" data-for="message">
+         <textarea class="form-control" name="message" data-form-field="message" id="message-form5-h" placeholder="Tell us about your fuel requirements" rows="4"></textarea>
         </div>
         <div class="col-lg-12 col-md-12 col-sm-12 align-center mbr-section-btn">
-         <button class="btn btn-primary display-4" type="submit">
-          Send message
-         </button>
+         <button type="submit" class="btn btn-primary display-4">Request Fuel Supply</button>
         </div>
        </div>
       </form>
@@ -229,125 +406,63 @@
     </div>
    </div>
   </section>
+
   <section class="footer1 cid-uA8dvqq7Kg" data-bs-version="5.1" id="footer1-i" once="footers">
    <div class="container">
     <div class="row mbr-white">
      <div class="col-12 col-md-6 col-lg-3">
-      <h5 class="mbr-section-subtitle mbr-fonts-style mb-2 display-7">
-       <strong>
-        Links
-       </strong>
-      </h5>
+      <h5 class="mbr-section-subtitle mbr-fonts-style mb-2 display-7"><strong>Links</strong></h5>
       <ul class="list mbr-fonts-style display-4">
+       <li class="mbr-text item-wrap"><a href="index.html" class="text-primary">Home</a></li>
        <li class="mbr-text item-wrap">
-        <a class="text-primary" href="index.html">
-         Home
-        </a>
+        <a href="MbulaheniGroup-IT.html" class="text-primary">Managed IT Services</a><br>
+        <a href="Mbulahenigroup-Cleaning.html" class="text-primary">Cleaning Services</a><br>
+        <a href="Mbulahenigroup-Fuel.html" class="text-primary">Fuel Supply</a><br>
+        <a href="Mbulahenigroup-Civil.html" class="text-primary">Civil Engineering</a><br>
+        <a href="mbulahenigroup-security.html" class="text-primary">Security Services</a>
        </li>
-       <li class="mbr-text item-wrap">
-        <a class="text-primary" href="MbulaheniGroup-IT.html">
-         Managed IT Services
-        </a>
-        <br/>
-        <a class="text-primary" href="Mbulahenigroup-Cleaning.html">
-         Cleaning Services
-        </a>
-        <br/>
-        <a class="text-primary" href="Mbulahenigroup-Fuel.html">
-         Fuel Supply
-        </a>
-        <br/>
-        <a class="text-primary" href="Mbulahenigroup-Civil.html">
-         Civil Engineering
-        </a>
-        <br/>
-        <a class="text-primary" href="mbulahenigroup-security.html">
-         Security Services
-        </a>
-       </li>
-       <li class="mbr-text item-wrap">
-        <a class="text-primary" href="contact.html">
-         Contact Us
-        </a>
-       </li>
-       <li class="mbr-text item-wrap">
-        <a class="text-primary" href="https://wa.me/0726650565">
-         Whatsapp Us
-        </a>
-       </li>
-       <li class="mbr-text item-wrap">
-        Careers
-       </li>
+       <li class="mbr-text item-wrap"><a href="contact.html" class="text-primary">Contact Us</a></li>
+       <li class="mbr-text item-wrap"><a href="https://wa.me/27737335518" class="text-primary">Whatsapp Us</a></li>
+       <li class="mbr-text item-wrap"><a href="careers.html" class="text-primary">Careers</a></li>
       </ul>
      </div>
      <div class="col-12 col-md-6 col-lg-3">
       <h5 class="mbr-section-subtitle mbr-fonts-style mb-2 display-7">
-       The Mbulaheni Group
-       <br/>
+       The Mbulaheni Group<br>
        Excellence in every Service
       </h5>
-      <ul class="list mbr-fonts-style display-4">
-       <li class="mbr-text item-wrap">
-        <br/>
-       </li>
-       <li class="mbr-text item-wrap">
-        <br/>
-       </li>
-      </ul>
+      <p class="mbr-text mbr-fonts-style display-7">
+       Providing reliable fuel supply solutions to businesses across South Africa with commitment to quality and service excellence.
+      </p>
      </div>
      <div class="col-12 col-md-6 col-lg-3">
       <h5 class="mbr-section-subtitle mbr-fonts-style mb-2 display-7">
-       Email:
-       <a class="text-primary" href="mailto:info@mbulahenigroup.co.za">
-        Info@mbulahenigroup.co.za
-       </a>
-       <br/>
-       Call:
-       <br/>
-       <a class="text-primary" href="tel:087 093 1138">
-        087 093 1138
-       </a>
-       <br/>
-       <br/>
+       Email:<br>
+       <a href="mailto:info@mbulahenigroup.co.za" class="text-primary">Info@mbulahenigroup.co.za</a><br>
+       Call:<br>
+       <a href="tel:0870931138" class="text-primary">087 093 1138</a><br>
+       Emergency Fuel Line:<br>
+       <a href="tel:0737335518" class="text-primary">073 733 5518</a>
       </h5>
-      <ul class="list mbr-fonts-style display-4">
-       <li class="mbr-text item-wrap">
-        <br/>
-       </li>
-       <li class="mbr-text item-wrap">
-        <br/>
-       </li>
-       <li class="mbr-text item-wrap">
-        <br/>
-       </li>
-      </ul>
      </div>
      <div class="col-12 col-md-6 col-lg-3">
-      <h5 class="mbr-section-subtitle mbr-fonts-style mb-2 display-7">
-       <strong>
-        About
-       </strong>
-      </h5>
+      <h5 class="mbr-section-subtitle mbr-fonts-style mb-2 display-7"><strong>About</strong></h5>
       <p class="mbr-text mbr-fonts-style mb-4 display-4">
        Serving South Africa with excellence in IT, Fuel Supply, Civil Engineering, Cleaning, and Security Services
       </p>
-      <h5 class="mbr-section-subtitle mbr-fonts-style mb-3 display-7">
-       <strong>
-        Social
-       </strong>
-      </h5>
+      <h5 class="mbr-section-subtitle mbr-fonts-style mb-3 display-7"><strong>Social</strong></h5>
       <div class="social-row display-7">
        <div class="soc-item">
-        <span class="mbr-iconfont socicon-facebook socicon" style="color: rgb(230, 198, 59); fill: rgb(230, 198, 59);">
-        </span>
+        <a href="#" class="mbr-iconfont socicon-facebook socicon" style="color: rgb(230, 198, 59); fill: rgb(230, 198, 59);"></a>
        </div>
        <div class="soc-item">
-        <span class="mbr-iconfont socicon-twitter socicon" style="color: rgb(230, 198, 59); fill: rgb(230, 198, 59);">
-        </span>
+        <a href="#" class="mbr-iconfont socicon-twitter socicon" style="color: rgb(230, 198, 59); fill: rgb(230, 198, 59);"></a>
        </div>
        <div class="soc-item">
-        <span class="mbr-iconfont socicon-instagram socicon" style="color: rgb(230, 198, 59); fill: rgb(230, 198, 59);">
-        </span>
+        <a href="#" class="mbr-iconfont socicon-instagram socicon" style="color: rgb(230, 198, 59); fill: rgb(230, 198, 59);"></a>
+       </div>
+       <div class="soc-item">
+        <a href="#" class="mbr-iconfont socicon-linkedin socicon" style="color: rgb(230, 198, 59); fill: rgb(230, 198, 59);"></a>
        </div>
       </div>
      </div>
@@ -359,34 +474,17 @@
     </div>
    </div>
   </section>
-  <section class="display-7" style="padding: 0;align-items: center;justify-content: center;flex-wrap: wrap;    align-content: center;display: flex;position: relative;height: 4rem;">
-   <a 1="" 100%;z-index:="" 1;"="" 1;height:="" 4rem;position:="" absolute;width:="" href='style="flex:'>
-    <img alt="" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" style="height: 4rem;"/>
-   </a>
-   <p class="display-7" style="margin: 0;text-align: center;">
-    ‌
-   </p>
-   <a assets="" bootstrap="" bootstrap.bundle.min.js"="" href="&gt;Mbulaheni Group&lt;/a&gt;&lt;/section&gt;&lt;script src=" js="" style="z-index:1">
-    <script src="assets/parallax/jarallax.js">
-    </script>
-    <script src="assets/smoothscroll/smooth-scroll.js">
-    </script>
-    <script src="assets/ytplayer/index.js">
-    </script>
-    <script src="assets/dropdown/js/navbar-dropdown.js">
-    </script>
-    <script src="assets/theme/js/script.js">
-    </script>
-    <script src="assets/formoid/formoid.min.js">
-    </script>
-    <div class="scrollToTop mbr-arrow-up" id="scrollToTop">
-     <a style="text-align: center;">
-      <i class="mbr-arrow-up-icon mbr-arrow-up-icon-cm cm-icon cm-icon-smallarrow-up">
-      </i>
-     </a>
-    </div>
-    <input name="animation" type="hidden"/>
-   </a>
-  </section>
+
+  <script src="assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/parallax/jarallax.js"></script>
+  <script src="assets/smoothscroll/smooth-scroll.js"></script>
+  <script src="assets/ytplayer/index.js"></script>
+  <script src="assets/dropdown/js/navbar-dropdown.js"></script>
+  <script src="assets/theme/js/script.js"></script>
+  <script src="assets/formoid/formoid.min.js"></script>
+  <div class="scrollToTop mbr-arrow-up" id="scrollToTop">
+   <a href="#" style="text-align: center;"><i class="mbr-arrow-up-icon mbr-arrow-up-icon-cm cm-icon cm-icon-smallarrow-up"></i></a>
+  </div>
+  <input name="animation" type="hidden"/>
  </body>
 </html>
