@@ -278,6 +278,9 @@
     </div>
    </div>
   </section>
+  
+  <section class="container my-5 py-5">
+    <div class="row">
       <div class="col-lg-6">
         <h3 class="mb-4">Visit Our Office</h3>
         <div class="map-container">
@@ -312,12 +315,19 @@
     </div>
     <div class="row justify-content-center mt-4">
      <div class="col-lg-8 mx-auto mbr-form" data-form-type="formoid">
-      <form action="https://formsubmit.co/your-email@mbulahenigroup.co.za" method="POST" class="mbr-form form-with-styler" data-form-title="Contact Form">
-       <input type="hidden" name="_subject" value="New Contact Form Submission">
-       <input type="hidden" name="_template" value="table">
-       <input type="hidden" name="_captcha" value="false">
-       <input type="hidden" name="_next" value="https://mbulahenigroup.co.za/thank-you.html">
+      <!-- MOBIRISE Form Configuration -->
+      <form action="https://mobirise.eu/" class="mbr-form form-with-styler" data-form-title="Contact Form" method="POST">
+       <input data-form-email="true" name="email" type="hidden" value="WUhikM6+1QpmPvg1EyTghMr8ufZRPEhdPpPj0poUITAn6j7Y6ru9dwgxYsGJNJAV03EjLBeKv3XIdTwJrajR1/ubguVEZ8JxRWBcs4b0ECnQ+YtopDT76xsI7HN91+pB"/>
        <div class="row">
+        <!-- Success/Error Messages -->
+        <div class="alert alert-success col-12" data-form-alert="" hidden="hidden">
+         Thanks for filling out the form! We'll contact you shortly.
+        </div>
+        <div class="alert alert-danger col-12" data-form-alert-danger="" hidden="hidden">
+         Oops...! There was a problem submitting your form. Please try again or call us directly.
+        </div>
+       </div>
+       <div class="dragArea row">
         <div class="col-md-6 col-sm-12 form-group mb-3" data-for="name">
          <input type="text" class="form-control" name="name" data-form-field="name" id="name-form5-1a" placeholder="Your Full Name" required="">
         </div>
@@ -331,7 +341,7 @@
          <input type="text" class="form-control" name="company" data-form-field="company" id="company-form5-1a" placeholder="Company Name">
         </div>
         <div class="col-md-6 col-sm-12 form-group mb-3" data-for="service">
-         <select class="form-control" name="service" id="service-form5-1a">
+         <select class="form-control" name="service" id="service-form5-1a" data-form-field="service">
            <option value="">Select Service</option>
            <option value="IT Services">IT Services</option>
            <option value="Cleaning Services">Cleaning Services</option>
@@ -342,7 +352,7 @@
          </select>
         </div>
         <div class="col-md-6 col-sm-12 form-group mb-3" data-for="urgency">
-         <select class="form-control" name="urgency" id="urgency-form5-1a">
+         <select class="form-control" name="urgency" id="urgency-form5-1a" data-form-field="urgency">
            <option value="">Urgency Level</option>
            <option value="General">General Inquiry</option>
            <option value="Important">Important</option>
@@ -441,6 +451,4 @@
   <div class="scrollToTop mbr-arrow-up" id="scrollToTop">
    <a href="#" style="text-align: center;"><i class="mbr-arrow-up-icon mbr-arrow-up-icon-cm cm-icon cm-icon-smallarrow-up"></i></a>
   </div>
-  <input name="animation" type="hidden"/>
- </body>
-</html>
+  <input name="animatio
