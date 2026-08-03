@@ -3,303 +3,448 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mbulaheni Group — Central OS</title>
+<title>MGIS OS — Executive Command Center</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <style>
-/* ============ TOKENS ============ */
-:root{
-  --obsidian:#0a0e14;
-  --panel:#111826;
-  --panel-2:#141d2c;
-  --elevated:#182337;
-  --border:#212e42;
-  --border-soft:#1a2436;
-  --text:#e7ecf3;
-  --text-dim:#8c98ac;
-  --text-faint:#5c6b83;
-  --teal:#2dd4bf;
-  --teal-dim:#1b8f80;
-  --amber:#f2a541;
-  --violet:#a78bfa;
-  --blue:#5eaaff;
-  --rose:#fb7c8d;
-  --red:#ef5a6f;
-  --green:#4ade80;
-  --radius:10px;
-  --radius-lg:16px;
-  --font-display:'Plus Jakarta Sans',sans-serif;
-  --font-mono:'IBM Plex Mono',monospace;
+:root {
+  --obsidian: #0a0e14;
+  --panel: #111826;
+  --panel-2: #141d2c;
+  --elevated: #182337;
+  --border: #212e42;
+  --border-soft: #1a2436;
+  --text: #e7ecf3;
+  --text-dim: #8c98ac;
+  --text-faint: #5c6b83;
+  --teal: #2dd4bf;
+  --teal-dim: #1b8f80;
+  --amber: #f2a541;
+  --violet: #a78bfa;
+  --blue: #5eaaff;
+  --rose: #fb7c8d;
+  --red: #ef5a6f;
+  --green: #4ade80;
+  --radius: 10px;
+  --radius-lg: 16px;
+  --font-display: 'Plus Jakarta Sans', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
 }
-*{box-sizing:border-box;}
-html,body{margin:0;padding:0;}
-body{
-  background:
-    radial-gradient(1200px 600px at 85% -10%, rgba(45,212,191,0.06), transparent 60%),
-    radial-gradient(900px 500px at -5% 100%, rgba(167,139,250,0.05), transparent 60%),
-    var(--obsidian);
-  color:var(--text);
-  font-family:var(--font-display);
-  min-height:100vh;
-  -webkit-font-smoothing:antialiased;
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: radial-gradient(1200px 600px at 85% -10%, rgba(45,212,191,0.06), transparent 60%),
+              radial-gradient(900px 500px at -5% 100%, rgba(167,139,250,0.05), transparent 60%),
+              var(--obsidian);
+  color: var(--text);
+  font-family: var(--font-display);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
 }
-::selection{background:rgba(45,212,191,0.25);}
-::-webkit-scrollbar{width:10px;height:10px;}
-::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:8px;}
-a{color:inherit;}
-button{font-family:inherit;}
-:focus-visible{outline:2px solid var(--teal);outline-offset:2px;}
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 8px; }
+a { color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
 
-/* ============ LAYOUT ============ */
-.app{display:grid;grid-template-columns:248px 1fr;min-height:100vh;}
-@media(max-width:900px){.app{grid-template-columns:1fr;}}
+/* ─── LAYOUT ─── */
+.app { display: grid; grid-template-columns: 248px 1fr; min-height: 100vh; }
+@media (max-width: 900px) { .app { grid-template-columns: 1fr; } }
 
-/* ---- Sidebar ---- */
-.sidebar{
-  background:linear-gradient(180deg, var(--panel), var(--obsidian));
-  border-right:1px solid var(--border-soft);
-  padding:22px 16px;
-  position:sticky;top:0;height:100vh;
-  display:flex;flex-direction:column;
-  z-index:20;
+/* ─── SIDEBAR ─── */
+.sidebar {
+  background: linear-gradient(180deg, var(--panel), var(--obsidian));
+  border-right: 1px solid var(--border-soft);
+  padding: 22px 16px;
+  position: sticky; top: 0; height: 100vh;
+  display: flex; flex-direction: column;
+  z-index: 20;
 }
-@media(max-width:900px){
-  .sidebar{position:fixed;left:0;top:0;width:248px;transform:translateX(-100%);transition:transform .25s ease;box-shadow:20px 0 40px rgba(0,0,0,.5);}
-  .sidebar.open{transform:translateX(0);}
+.sidebar .nav { flex: 1; overflow-y: auto; padding-right: 2px; margin-right: -2px; }
+.sidebar .nav::-webkit-scrollbar { width: 5px; }
+@media (max-width: 900px) {
+  .sidebar { position: fixed; left: 0; top: 0; width: 248px; transform: translateX(-100%); transition: transform .25s ease; box-shadow: 20px 0 40px rgba(0,0,0,.5); }
+  .sidebar.open { transform: translateX(0); }
 }
-.brand{display:flex;align-items:center;gap:10px;padding:2px 6px 22px;}
-.brand-mark{
-  width:34px;height:34px;border-radius:9px;
-  background:conic-gradient(from 220deg, var(--teal), var(--blue) 40%, var(--violet) 75%, var(--teal));
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--font-mono);font-weight:600;font-size:13px;color:var(--obsidian);
-  flex:none;
+.brand { display: flex; align-items: center; gap: 10px; padding: 2px 6px 22px; }
+.brand-mark {
+  width: 34px; height: 34px; border-radius: 9px;
+  background: conic-gradient(from 220deg, var(--teal), var(--blue) 40%, var(--violet) 75%, var(--teal));
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-weight: 600; font-size: 13px; color: var(--obsidian);
+  flex: none;
 }
-.brand-text{line-height:1.15;}
-.brand-text .g{font-weight:800;font-size:14.5px;letter-spacing:.2px;}
-.brand-text .s{font-family:var(--font-mono);font-size:10.5px;color:var(--text-dim);letter-spacing:.14em;text-transform:uppercase;}
+.brand-text { line-height: 1.15; }
+.brand-text .g { font-weight: 800; font-size: 14.5px; letter-spacing: .2px; }
+.brand-text .s { font-family: var(--font-mono); font-size: 10.5px; color: var(--text-dim); letter-spacing: .14em; text-transform: uppercase; }
 
-.nav{display:flex;flex-direction:column;gap:2px;margin-top:6px;}
-.nav-label{font-family:var(--font-mono);font-size:10px;letter-spacing:.16em;color:var(--text-faint);text-transform:uppercase;margin:16px 10px 6px;}
-.nav-item{
-  display:flex;align-items:center;gap:11px;
-  padding:9px 11px;border-radius:9px;
-  color:var(--text-dim);font-size:13.5px;font-weight:600;
-  cursor:pointer;border:1px solid transparent;
-  transition:background .15s, color .15s, border-color .15s;
-  white-space:nowrap;
+.nav { display: flex; flex-direction: column; gap: 2px; margin-top: 6px; }
+.nav-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: .16em; color: var(--text-faint); text-transform: uppercase; margin: 16px 10px 6px; }
+.nav-item {
+  display: flex; align-items: center; gap: 11px;
+  padding: 9px 11px; border-radius: 9px;
+  color: var(--text-dim); font-size: 13.5px; font-weight: 600;
+  cursor: pointer; border: 1px solid transparent;
+  transition: background .15s, color .15s, border-color .15s;
+  white-space: nowrap;
 }
-.nav-item svg{flex:none;width:16px;height:16px;opacity:.85;}
-.nav-item:hover{background:var(--elevated);color:var(--text);}
-.nav-item.active{background:rgba(45,212,191,0.09);color:var(--teal);border-color:rgba(45,212,191,0.22);}
-.nav-item.active svg{opacity:1;}
-.nav-badge{
-  margin-left:auto;font-family:var(--font-mono);font-size:10px;
-  background:var(--elevated);color:var(--text-dim);border-radius:6px;padding:1px 6px;
+.nav-item svg { flex: none; width: 16px; height: 16px; opacity: .85; }
+.nav-item:hover { background: var(--elevated); color: var(--text); }
+.nav-item.active { background: rgba(45,212,191,0.09); color: var(--teal); border-color: rgba(45,212,191,0.22); }
+.nav-item.active svg { opacity: 1; }
+.nav-badge {
+  margin-left: auto; font-family: var(--font-mono); font-size: 10px;
+  background: var(--elevated); color: var(--text-dim); border-radius: 6px; padding: 1px 6px;
 }
-.nav-item.active .nav-badge{background:rgba(45,212,191,0.18);color:var(--teal);}
+.nav-item.active .nav-badge { background: rgba(45,212,191,0.18); color: var(--teal); }
+.nav-item.disabled { opacity: .45; cursor: not-allowed; }
+.nav-item.disabled:hover { background: transparent; color: var(--text-dim); }
 
-.sidebar-foot{margin-top:auto;padding-top:14px;border-top:1px solid var(--border-soft);}
-.mode-pill{
-  display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:10.5px;
-  padding:8px 10px;border-radius:8px;background:var(--panel-2);border:1px solid var(--border-soft);color:var(--text-dim);
+.sidebar-foot { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--border-soft); }
+.mode-pill {
+  display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 10.5px;
+  padding: 8px 10px; border-radius: 8px; background: var(--panel-2); border: 1px solid var(--border-soft); color: var(--text-dim);
 }
-.mode-dot{width:7px;height:7px;border-radius:50%;background:var(--amber);flex:none;}
-.mode-dot.live{background:var(--green);box-shadow:0 0 8px rgba(74,222,128,.6);}
-.whoami{margin-top:10px;font-size:11px;color:var(--text-faint);padding:0 2px;}
-.whoami b{color:var(--text-dim);}
+.mode-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--amber); flex: none; }
+.mode-dot.live { background: var(--green); box-shadow: 0 0 8px rgba(74,222,128,.6); }
+.whoami { margin-top: 10px; font-size: 11px; color: var(--text-faint); padding: 0 2px; }
+.whoami b { color: var(--text-dim); }
 
-/* ---- Main ---- */
-.main{padding:26px 34px 60px;max-width:1400px;width:100%;}
-@media(max-width:640px){.main{padding:18px 16px 50px;}}
-.topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:26px;flex-wrap:wrap;}
-.topbar h1{font-size:22px;margin:0 0 4px;letter-spacing:-.01em;}
-.topbar .sub{color:var(--text-dim);font-size:13px;max-width:60ch;}
-.menu-toggle{display:none;background:var(--panel);border:1px solid var(--border);color:var(--text);width:38px;height:38px;border-radius:9px;align-items:center;justify-content:center;cursor:pointer;}
-@media(max-width:900px){.menu-toggle{display:flex;}}
-.top-actions{display:flex;gap:10px;flex:none;}
-
-/* ============ COMPONENTS ============ */
-.btn{
-  font-family:var(--font-display);font-weight:700;font-size:13px;
-  padding:9px 15px;border-radius:9px;border:1px solid var(--border);
-  background:var(--elevated);color:var(--text);cursor:pointer;
-  display:inline-flex;align-items:center;gap:7px;white-space:nowrap;
-  transition:transform .1s, border-color .15s, background .15s;
+/* ─── TOPBAR ─── */
+.main { padding: 20px 30px 50px; max-width: 1600px; width: 100%; }
+@media (max-width: 640px) { .main { padding: 14px 12px 40px; } }
+.topbar {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 22px; flex-wrap: wrap;
 }
-.btn:hover{border-color:var(--teal-dim);transform:translateY(-1px);}
-.btn.primary{background:linear-gradient(135deg, var(--teal), #22b8a3);color:#06231f;border:none;}
-.btn.primary:hover{filter:brightness(1.06);}
-.btn.ghost{background:transparent;}
-.btn.danger{color:var(--red);}
-.btn.sm{padding:6px 10px;font-size:12px;border-radius:7px;}
-.btn.auth{background:rgba(94,170,255,.12);border-color:rgba(94,170,255,.25);color:var(--blue);}
-.btn.auth:hover{border-color:var(--blue);}
-
-.grid{display:grid;gap:16px;}
-.grid.cols-4{grid-template-columns:repeat(4,1fr);}
-.grid.cols-3{grid-template-columns:repeat(3,1fr);}
-.grid.cols-2{grid-template-columns:repeat(2,1fr);}
-@media(max-width:1100px){.grid.cols-4{grid-template-columns:repeat(2,1fr);}.grid.cols-3{grid-template-columns:repeat(2,1fr);}}
-@media(max-width:640px){.grid.cols-4,.grid.cols-3,.grid.cols-2{grid-template-columns:1fr;}}
-
-.card{
-  background:linear-gradient(180deg, var(--panel-2), var(--panel));
-  border:1px solid var(--border-soft);border-radius:var(--radius-lg);
-  padding:18px;position:relative;overflow:hidden;
+.topbar-left { display: flex; align-items: center; gap: 14px; flex: 1; }
+.topbar-left h1 { font-size: 20px; margin: 0; letter-spacing: -.01em; }
+.topbar-left .sub { color: var(--text-dim); font-size: 12.5px; margin-left: 10px; }
+.menu-toggle {
+  display: none; background: var(--panel); border: 1px solid var(--border); color: var(--text);
+  width: 36px; height: 36px; border-radius: 9px; align-items: center; justify-content: center; cursor: pointer;
 }
-.card.railed{border-left:3px solid var(--rail,var(--teal));}
+@media (max-width: 900px) { .menu-toggle { display: flex; } }
 
-.kpi .kpi-top{display:flex;align-items:center;justify-content:space-between;color:var(--text-dim);font-size:12px;font-weight:600;}
-.kpi .kpi-num{font-family:var(--font-mono);font-size:30px;font-weight:600;margin-top:10px;color:var(--text);}
-.kpi .kpi-foot{margin-top:6px;font-size:11.5px;color:var(--text-faint);}
-.kpi .kpi-foot.up{color:var(--green);}
-.kpi .kpi-foot.warn{color:var(--amber);}
-.kpi .kpi-foot.bad{color:var(--red);}
+.top-actions { display: flex; gap: 8px; align-items: center; flex: none; }
+.gsearch { position: relative; flex: 1; max-width: 340px; min-width: 140px; }
+.gsearch input { padding: 8px 12px 8px 34px; background: var(--panel-2); border: 1px solid var(--border-soft); font-size: 12px; border-radius: 10px; width: 100%; color: var(--text); }
+.gsearch input:focus { border-color: var(--teal-dim); }
+.gsearch svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--text-faint); pointer-events: none; }
+.gsearch-kbd { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-family: var(--font-mono); font-size: 9px; color: var(--text-faint); background: var(--elevated); border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px; pointer-events: none; }
+@media (max-width: 760px) { .gsearch { display: none; } }
 
-.section-title{display:flex;align-items:center;justify-content:space-between;margin:30px 0 14px;gap:10px;flex-wrap:wrap;}
-.section-title h2{font-size:15px;margin:0;letter-spacing:.01em;}
-.section-title .hint{color:var(--text-faint);font-size:11.5px;font-family:var(--font-mono);}
-
-.dtag{
-  display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:10.5px;
-  padding:3px 8px 3px 7px;border-radius:20px;background:var(--elevated);border:1px solid var(--border);
-  color:var(--text-dim);white-space:nowrap;
+.notif-wrap { position: relative; flex: none; }
+.notif-btn {
+  position: relative; background: var(--panel-2); border: 1px solid var(--border-soft); color: var(--text);
+  width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 17px; cursor: pointer;
 }
-.dtag .dot{width:6px;height:6px;border-radius:50%;background:var(--dc,var(--teal));flex:none;}
-
-.dh-card{display:flex;flex-direction:column;gap:12px;}
-.dh-head{display:flex;align-items:center;gap:12px;}
-.dh-icon{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-weight:700;font-size:15px;flex:none;color:#06131a;}
-.dh-name{font-weight:700;font-size:15px;}
-.dh-desc{color:var(--text-dim);font-size:12.5px;line-height:1.5;}
-.dh-url{font-family:var(--font-mono);font-size:10.5px;color:var(--text-faint);word-break:break-all;}
-.dh-stats{display:flex;gap:14px;margin-top:2px;}
-.dh-stat{font-family:var(--font-mono);}
-.dh-stat b{display:block;font-size:18px;color:var(--text);}
-.dh-stat span{font-size:10px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.08em;}
-.dh-actions{display:flex;gap:8px;margin-top:auto;padding-top:6px;}
-
-.table-wrap{background:var(--panel-2);border:1px solid var(--border-soft);border-radius:var(--radius-lg);overflow:hidden;}
-table{width:100%;border-collapse:collapse;font-size:13px;}
-thead th{
-  text-align:left;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
-  color:var(--text-faint);padding:11px 14px;border-bottom:1px solid var(--border-soft);background:var(--panel);white-space:nowrap;
+.notif-btn:hover { border-color: var(--teal-dim); }
+.notif-dot {
+  position: absolute; top: 4px; right: 4px; min-width: 14px; height: 14px; padding: 0 3px;
+  border-radius: 20px; background: var(--red); color: #fff; font-family: var(--font-mono); font-size: 8px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 2px var(--obsidian);
 }
-tbody td{padding:11px 14px;border-bottom:1px solid var(--border-soft);vertical-align:middle;}
-tbody tr:last-child td{border-bottom:none;}
-tbody tr:hover{background:rgba(255,255,255,.015);}
-.cell-main{font-weight:600;}
-.cell-sub{color:var(--text-faint);font-size:11.5px;margin-top:2px;}
-.table-empty{padding:34px 20px;text-align:center;color:var(--text-faint);font-size:13px;}
-.table-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:12px 14px;border-bottom:1px solid var(--border-soft);background:var(--panel);}
-.table-scroll{overflow-x:auto;}
-
-input,select,textarea{
-  font-family:var(--font-display);font-size:13px;color:var(--text);
-  background:var(--elevated);border:1px solid var(--border);border-radius:8px;
-  padding:8px 11px;width:100%;
+.notif-panel {
+  position: absolute; top: 44px; right: 0; width: 340px; max-width: 82vw;
+  background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-lg);
+  box-shadow: 0 20px 60px rgba(0,0,0,.5); z-index: 90; overflow: hidden; display: none;
 }
-textarea{resize:vertical;min-height:70px;}
-input:focus,select:focus,textarea:focus{border-color:var(--teal-dim);}
-label{display:block;font-size:11.5px;color:var(--text-dim);margin-bottom:5px;font-weight:600;}
-.field{margin-bottom:13px;}
-.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-@media(max-width:560px){.field-row{grid-template-columns:1fr;}}
+.notif-panel.open { display: block; }
+.notif-panel-head { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border-soft); }
+.notif-panel-head b { font-size: 13px; }
+.notif-panel-head span { font-family: var(--font-mono); font-size: 10px; color: var(--text-faint); cursor: pointer; }
+.notif-list { max-height: 340px; overflow-y: auto; }
+.notif-item { display: flex; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--border-soft); cursor: pointer; align-items: flex-start; }
+.notif-item:hover { background: var(--elevated); }
+.notif-item:last-child { border-bottom: none; }
+.notif-ico { width: 7px; height: 7px; border-radius: 50%; margin-top: 5px; flex: none; background: var(--nc, var(--teal)); }
+.notif-body b { display: block; font-size: 12px; font-weight: 600; }
+.notif-body span { font-size: 10.5px; color: var(--text-faint); }
+.notif-panel-foot { padding: 8px 16px; text-align: center; border-top: 1px solid var(--border-soft); }
+.notif-panel-foot a { font-size: 11px; color: var(--teal); cursor: pointer; font-weight: 600; }
 
-.badge{font-family:var(--font-mono);font-size:10.5px;padding:3px 9px;border-radius:20px;font-weight:600;display:inline-block;white-space:nowrap;}
-.badge.b-new{background:rgba(94,170,255,.15);color:var(--blue);}
-.badge.b-progress{background:rgba(242,165,65,.15);color:var(--amber);}
-.badge.b-done{background:rgba(74,222,128,.15);color:var(--green);}
-.badge.b-lost{background:rgba(239,90,111,.15);color:var(--red);}
-.badge.b-neutral{background:var(--elevated);color:var(--text-dim);}
-
-.sev-critical{color:var(--red);font-weight:700;}
-.sev-high{color:var(--amber);font-weight:700;}
-.sev-medium{color:var(--blue);}
-.sev-low{color:var(--text-dim);}
-
-.stars{color:var(--amber);font-family:var(--font-mono);letter-spacing:1px;}
-
-.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
-.tab-btn{
-  font-family:var(--font-mono);font-size:11.5px;font-weight:600;padding:7px 13px;border-radius:8px;
-  background:var(--panel-2);border:1px solid var(--border-soft);color:var(--text-dim);cursor:pointer;
+.avatar-btn {
+  width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--teal), var(--blue));
+  border: none; color: #050810; font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center;
 }
-.tab-btn.active{background:rgba(45,212,191,.1);border-color:rgba(45,212,191,.3);color:var(--teal);}
 
-/* modal */
-.overlay{position:fixed;inset:0;background:rgba(6,9,14,.72);backdrop-filter:blur(3px);display:flex;align-items:flex-start;justify-content:center;padding:5vh 16px;z-index:100;overflow-y:auto;}
-.overlay.hidden{display:none;}
-.modal{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);width:100%;max-width:560px;padding:24px;box-shadow:0 30px 80px rgba(0,0,0,.5);}
-.modal h3{margin:0 0 4px;font-size:16px;}
-.modal .modal-sub{color:var(--text-faint);font-size:12px;margin-bottom:18px;}
-.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px;}
-
-.empty-state{text-align:center;padding:50px 20px;color:var(--text-faint);}
-.empty-state .icon{font-size:26px;margin-bottom:10px;opacity:.6;}
-.empty-state .msg{font-size:13.5px;color:var(--text-dim);margin-bottom:14px;}
-
-.banner{
-  display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:11px;
-  background:rgba(242,165,41,.08);border:1px solid rgba(242,165,41,.25);color:#f2c383;font-size:12.5px;margin-bottom:22px;
+/* ─── SEARCH MODAL ─── */
+.search-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(6px);
+  z-index: 1000; display: none; align-items: flex-start; justify-content: center; padding-top: 10vh;
 }
-.banner.info{background:rgba(94,170,255,.08);border-color:rgba(94,170,255,.25);color:#a9cdff;}
-.banner.success{background:rgba(74,222,128,.08);border-color:rgba(74,222,128,.25);color:#80f0a0;}
-.banner b{font-weight:700;}
-.banner .btn{flex:none;}
+.search-overlay.open { display: flex; }
+.search-modal {
+  background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-lg);
+  width: 640px; max-width: 92%; max-height: 60vh; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+}
+.search-modal .sm-input { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--border-soft); }
+.search-modal .sm-input svg { width: 18px; height: 18px; color: var(--text-faint); flex: none; }
+.search-modal input { border: none; background: transparent; font-size: 15px; padding: 4px 0; width: 100%; color: var(--text); }
+.search-modal input:focus { outline: none; }
+.sm-results { max-height: 45vh; overflow-y: auto; padding: 6px 0; }
+.sm-cat { font-family: var(--font-mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-faint); padding: 8px 16px 4px; }
+.sm-row { display: flex; align-items: center; gap: 11px; padding: 8px 16px; cursor: pointer; }
+.sm-row:hover { background: var(--elevated); }
+.sm-row .ico { width: 28px; height: 28px; border-radius: 7px; background: var(--elevated); display: flex; align-items: center; justify-content: center; font-size: 13px; flex: none; }
+.sm-row .main { flex: 1; min-width: 0; }
+.sm-row .main b { font-size: 12.5px; font-weight: 600; display: block; }
+.sm-row .main span { font-size: 10.5px; color: var(--text-faint); }
+.sm-row .meta { font-family: var(--font-mono); font-size: 9px; color: var(--text-faint); flex: none; }
 
-.rail-dot{width:8px;height:8px;border-radius:50%;flex:none;background:var(--rc,var(--teal));}
+/* ─── CARDS ─── */
+.card {
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  border: 1px solid var(--border-soft); border-radius: var(--radius-lg);
+  padding: 16px 18px; position: relative; overflow: hidden;
+}
+.card.railed { border-left: 3px solid var(--rail, var(--teal)); }
 
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
-.cal-dow{font-family:var(--font-mono);font-size:10px;color:var(--text-faint);text-align:center;padding-bottom:4px;text-transform:uppercase;letter-spacing:.08em;}
-.cal-cell{min-height:74px;border:1px solid var(--border-soft);border-radius:9px;padding:6px;background:var(--panel-2);cursor:pointer;}
-.cal-cell.today{border-color:var(--teal-dim);}
-.cal-cell.faded{opacity:.35;}
-.cal-cell .d{font-family:var(--font-mono);font-size:11px;color:var(--text-dim);}
-.cal-cell .items{margin-top:4px;display:flex;flex-direction:column;gap:2px;}
-.cal-chip{font-size:9.5px;background:var(--elevated);border-radius:5px;padding:1px 5px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.cal-more{font-size:9.5px;color:var(--text-faint);}
+.kpi .kpi-top { display: flex; align-items: center; justify-content: space-between; color: var(--text-dim); font-size: 11.5px; font-weight: 600; }
+.kpi .kpi-num { font-family: var(--font-mono); font-size: 28px; font-weight: 600; margin-top: 6px; color: var(--text); }
+.kpi .kpi-foot { margin-top: 4px; font-size: 11px; color: var(--text-faint); }
+.kpi .kpi-foot.up { color: var(--green); }
+.kpi .kpi-foot.warn { color: var(--amber); }
+.kpi .kpi-foot.bad { color: var(--red); }
 
-.freelancer-row{display:flex;align-items:center;gap:12px;}
-.avatar{width:32px;height:32px;border-radius:50%;background:var(--elevated);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--text-dim);flex:none;}
+.grid { display: grid; gap: 14px; }
+.grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+.grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 1100px) { .grid.cols-4 { grid-template-columns: repeat(2, 1fr); } .grid.cols-3 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px) { .grid.cols-4, .grid.cols-3, .grid.cols-2 { grid-template-columns: 1fr; } }
 
-.icon-btn{background:transparent;border:1px solid transparent;color:var(--text-faint);width:28px;height:28px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;}
-.icon-btn:hover{background:var(--elevated);color:var(--text);border-color:var(--border);}
-.row-actions{display:flex;gap:4px;justify-content:flex-end;}
+.section-title { display: flex; align-items: center; justify-content: space-between; margin: 24px 0 12px; gap: 10px; flex-wrap: wrap; }
+.section-title h2 { font-size: 14px; margin: 0; letter-spacing: .01em; }
+.section-title .hint { color: var(--text-faint); font-size: 11px; font-family: var(--font-mono); }
 
-.chk{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-dim);}
-.chk input{width:auto;}
+.dtag {
+  display: inline-flex; align-items: center; gap: 5px; font-family: var(--font-mono); font-size: 10px;
+  padding: 2px 8px 2px 6px; border-radius: 20px; background: var(--elevated); border: 1px solid var(--border);
+  color: var(--text-dim); white-space: nowrap;
+}
+.dtag .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--dc, var(--teal)); flex: none; }
 
-.footer-note{margin-top:44px;padding-top:18px;border-top:1px solid var(--border-soft);color:var(--text-faint);font-size:11.5px;font-family:var(--font-mono);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.badge {
+  font-family: var(--font-mono); font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 600; display: inline-block; white-space: nowrap;
+}
+.badge.b-new { background: rgba(94,170,255,.15); color: var(--blue); }
+.badge.b-progress { background: rgba(242,165,65,.15); color: var(--amber); }
+.badge.b-done { background: rgba(74,222,128,.15); color: var(--green); }
+.badge.b-lost { background: rgba(239,90,111,.15); color: var(--red); }
+.badge.b-neutral { background: var(--elevated); color: var(--text-dim); }
 
-.settings-block{background:var(--panel-2);border:1px solid var(--border-soft);border-radius:var(--radius-lg);padding:20px;margin-bottom:18px;}
-.settings-block h3{margin:0 0 4px;font-size:14px;}
-.settings-block .desc{color:var(--text-faint);font-size:12px;margin-bottom:16px;max-width:70ch;line-height:1.6;}
-code.inline{background:var(--elevated);border:1px solid var(--border);padding:1px 6px;border-radius:5px;font-family:var(--font-mono);font-size:11.5px;}
-.auth-status{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-.auth-status .pill{background:var(--elevated);border:1px solid var(--border);border-radius:20px;padding:2px 10px;font-size:11px;color:var(--text-dim);}
-.auth-status .pill.admin{color:var(--teal);border-color:rgba(45,212,191,.3);}
+.btn {
+  font-family: var(--font-display); font-weight: 700; font-size: 12.5px;
+  padding: 8px 14px; border-radius: 9px; border: 1px solid var(--border);
+  background: var(--elevated); color: var(--text); cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  transition: transform .1s, border-color .15s, background .15s;
+}
+.btn:hover { border-color: var(--teal-dim); transform: translateY(-1px); }
+.btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+.btn.primary { background: linear-gradient(135deg, var(--teal), #22b8a3); color: #06231f; border: none; }
+.btn.primary:hover { filter: brightness(1.06); }
+.btn.ghost { background: transparent; }
+.btn.danger { color: var(--red); }
+.btn.sm { padding: 5px 9px; font-size: 11px; border-radius: 7px; }
+.btn.success { background: rgba(74,222,128,.15); border-color: rgba(74,222,128,.3); color: var(--green); }
+.btn.success:hover { background: rgba(74,222,128,.25); }
 
-/* ---------- CALENDAR GRID ---------- */
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
-.cal-dow{font-family:var(--font-mono);font-size:10px;color:var(--text-faint);text-align:center;padding-bottom:4px;text-transform:uppercase;letter-spacing:.08em;}
-.cal-cell{min-height:70px;border:1px solid var(--border-soft);border-radius:8px;padding:5px;background:var(--panel-2);cursor:pointer;}
-.cal-cell.today{border-color:var(--teal-dim);}
-.cal-cell.faded{opacity:.35;}
-.cal-cell .d{font-family:var(--font-mono);font-size:11px;color:var(--text-dim);}
-.cal-cell .items{margin-top:3px;display:flex;flex-direction:column;gap:2px;}
-.cal-chip{font-size:9px;background:var(--elevated);border-radius:4px;padding:1px 4px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.cal-more{font-size:9px;color:var(--text-faint);}
+.table-wrap { background: var(--panel-2); border: 1px solid var(--border-soft); border-radius: var(--radius-lg); overflow: hidden; }
+.table-scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+thead th {
+  text-align: left; font-family: var(--font-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--text-faint); padding: 10px 12px; border-bottom: 1px solid var(--border-soft); background: var(--panel); white-space: nowrap;
+}
+tbody td { padding: 10px 12px; border-bottom: 1px solid var(--border-soft); vertical-align: middle; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: rgba(255,255,255,.015); }
+.cell-main { font-weight: 600; }
+.cell-sub { font-size: 10.5px; color: var(--text-faint); }
+.table-empty { padding: 28px 16px; text-align: center; color: var(--text-faint); font-size: 12.5px; }
+.icon-btn { background: var(--elevated); border: 1px solid var(--border); border-radius: 7px; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; color: var(--text-dim); }
+.icon-btn:hover { color: var(--teal); border-color: var(--teal-dim); }
+
+input, select, textarea {
+  font-family: var(--font-display); font-size: 12.5px; color: var(--text);
+  background: var(--elevated); border: 1px solid var(--border); border-radius: 8px;
+  padding: 7px 10px; width: 100%;
+}
+textarea { resize: vertical; min-height: 60px; }
+label { display: block; font-size: 11px; color: var(--text-dim); margin-bottom: 4px; font-weight: 600; }
+.field { margin-bottom: 12px; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (max-width: 560px) { .field-row { grid-template-columns: 1fr; } }
+
+.overlay { position: fixed; inset: 0; background: rgba(6,9,14,.72); backdrop-filter: blur(3px); display: flex; align-items: flex-start; justify-content: center; padding: 5vh 16px; z-index: 100; overflow-y: auto; }
+.overlay.hidden { display: none; }
+.modal { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-lg); width: 100%; max-width: 560px; padding: 22px; box-shadow: 0 30px 80px rgba(0,0,0,.5); }
+.modal h3 { margin: 0 0 4px; font-size: 15px; }
+.modal .modal-sub { color: var(--text-faint); font-size: 11.5px; margin-bottom: 16px; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+
+.footer-note { margin-top: 36px; padding-top: 14px; border-top: 1px solid var(--border-soft); color: var(--text-faint); font-size: 11px; font-family: var(--font-mono); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+#mgToast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--elevated); border: 1px solid var(--border); color: var(--text); padding: 8px 16px; border-radius: 9px; font-size: 12px; font-family: var(--font-mono); z-index: 200; opacity: 0; transition: opacity .2s; box-shadow: 0 12px 30px rgba(0,0,0,.4); }
+
+/* ─── HEALTH RING ─── */
+.ring {
+  width: 80px; height: 80px; border-radius: 50%; flex: none;
+  background: conic-gradient(var(--rc, var(--teal)) calc(var(--pct, 85) * 1%), var(--elevated) 0);
+  display: flex; align-items: center; justify-content: center; position: relative;
+}
+.ring::before { content: ''; position: absolute; inset: 6px; border-radius: 50%; background: var(--panel-2); }
+.ring b { position: relative; font-family: var(--font-mono); font-size: 20px; z-index: 1; }
+.ring span { position: relative; font-size: 8px; z-index: 1; }
+.ring-sm { width: 52px; height: 52px; }
+.ring-sm::before { inset: 4px; }
+.ring-sm b { font-size: 13px; }
+
+.health-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.health-row .lbl { width: 140px; flex: none; font-size: 11.5px; color: var(--text-dim); }
+.health-track { flex: 1; height: 6px; border-radius: 20px; background: var(--elevated); overflow: hidden; }
+.health-fill { height: 100%; border-radius: 20px; background: var(--hc, var(--teal)); }
+.health-row .val { width: 32px; flex: none; text-align: right; font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); }
+
+/* ─── MAP STRIP ─── */
+.map-strip { display: flex; flex-wrap: wrap; gap: 8px; }
+.map-tile {
+  flex: 1; min-width: 130px; background: var(--panel-2); border: 1px solid var(--border-soft); border-radius: 10px;
+  padding: 10px 13px; display: flex; flex-direction: column; gap: 4px;
+}
+.map-tile .mt-top { display: flex; align-items: center; justify-content: space-between; }
+.map-tile .mt-name { font-weight: 700; font-size: 12px; }
+.map-status { display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-mono); font-size: 9.5px; font-weight: 700; }
+.map-status .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--sc, var(--green)); }
+.map-tile .mt-sub { color: var(--text-faint); font-size: 10px; }
+
+/* ─── PRIORITY LIST ─── */
+.priority-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-bottom: 1px solid var(--border-soft); }
+.priority-item:last-child { border-bottom: none; }
+.priority-item .pi-icon { font-size: 14px; flex: none; }
+.priority-item .pi-text { flex: 1; font-size: 12px; }
+.priority-item .pi-tag { font-family: var(--font-mono); font-size: 9.5px; padding: 1px 8px; border-radius: 12px; background: var(--elevated); color: var(--text-faint); }
+
+/* ─── AI CHAT ─── */
+.ai-shell { display: flex; flex-direction: column; height: calc(100vh - 240px); min-height: 380px; background: var(--panel-2); border: 1px solid var(--border-soft); border-radius: var(--radius-lg); overflow: hidden; }
+.ai-msgs { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.ai-row { display: flex; gap: 10px; max-width: 80%; }
+.ai-row.me { align-self: flex-end; flex-direction: row-reverse; }
+.ai-avatar { width: 26px; height: 26px; border-radius: 8px; flex: none; display: flex; align-items: center; justify-content: center; font-size: 12px; background: var(--elevated); }
+.ai-row.me .ai-avatar { background: linear-gradient(135deg, var(--teal), #22b8a3); }
+.ai-bubble { background: var(--elevated); border: 1px solid var(--border-soft); border-radius: 12px 12px 12px 2px; padding: 9px 13px; font-size: 12.5px; line-height: 1.55; }
+.ai-row.me .ai-bubble { background: rgba(45,212,191,.1); border-color: rgba(45,212,191,.25); border-radius: 12px 12px 2px 12px; }
+.ai-suggest { display: flex; gap: 6px; flex-wrap: wrap; padding: 0 16px 10px; }
+.ai-chip { font-family: var(--font-mono); font-size: 10px; padding: 5px 11px; border-radius: 20px; background: var(--elevated); border: 1px solid var(--border); color: var(--text-dim); cursor: pointer; }
+.ai-chip:hover { border-color: var(--teal-dim); color: var(--text); }
+.ai-input { display: flex; gap: 8px; padding: 10px 14px; border-top: 1px solid var(--border-soft); background: var(--panel); }
+.ai-input input { background: var(--elevated); flex: 1; }
+.ai-banner { padding: 9px 13px; font-size: 11px; color: var(--amber); background: rgba(242,165,65,.08); border-bottom: 1px solid var(--border-soft); }
+
+/* ─── APPROVAL ROW ─── */
+.approval-row { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--border-soft); }
+.approval-row:last-child { border-bottom: none; }
+.approval-row .ap-main { flex: 1; min-width: 0; }
+.approval-row .ap-title { font-size: 12px; font-weight: 600; }
+.approval-row .ap-sub { font-size: 10.5px; color: var(--text-faint); margin-top: 1px; }
+.ap-actions { display: flex; gap: 6px; flex: none; }
+
+/* ─── ASSET TILE ─── */
+.at-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+.at-card { background: var(--panel-2); border: 1px solid var(--border-soft); border-radius: 10px; padding: 12px 14px; }
+.at-card .at-top { display: flex; justify-content: space-between; align-items: flex-start; }
+.at-card .at-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--elevated); display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.at-card .at-qr { font-family: var(--font-mono); font-size: 9px; color: var(--text-faint); background: var(--elevated); border-radius: 4px; padding: 1px 6px; }
+.at-card .at-name { font-weight: 600; font-size: 12.5px; margin-top: 6px; }
+.at-card .at-sub { font-size: 10.5px; color: var(--text-faint); }
+
+/* ─── FLEET ROW ─── */
+.fleet-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border-soft); }
+.fleet-row:last-child { border-bottom: none; }
+.plate { font-family: var(--font-mono); font-size: 10px; background: var(--elevated); border: 1px solid var(--border); border-radius: 5px; padding: 2px 8px; font-weight: 700; }
+
+/* ─── SETTINGS ─── */
+.settings-block { background: var(--panel-2); border: 1px solid var(--border-soft); border-radius: var(--radius-lg); padding: 18px; margin-bottom: 14px; }
+.settings-block h3 { font-size: 13px; margin: 0 0 4px; }
+.settings-block .desc { color: var(--text-faint); font-size: 11.5px; margin-bottom: 12px; max-width: 70ch; line-height: 1.6; }
+.auth-status { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.auth-status .pill { background: var(--elevated); border: 1px solid var(--border); border-radius: 20px; padding: 2px 10px; font-size: 11px; color: var(--text-dim); }
+.auth-status .pill.admin { color: var(--teal); border-color: rgba(45,212,191,.3); }
+
+/* ─── SECURITY TILE ─── */
+.sec-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+.sec-tile { background: var(--panel-2); border: 1px solid var(--border-soft); border-radius: 10px; padding: 12px; text-align: center; }
+.sec-tile .lbl { font-size: 10px; color: var(--text-faint); }
+.sec-tile .val { font-family: var(--font-mono); font-size: 18px; font-weight: 700; }
+
+/* ─── KNOWLEDGE TILE ─── */
+.kb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; }
+.kb-card { background: var(--panel-2); border: 1px solid var(--border-soft); border-radius: 9px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; }
+.kb-card .kb-ico { width: 30px; height: 30px; border-radius: 7px; background: var(--elevated); display: flex; align-items: center; justify-content: center; font-size: 14px; flex: none; }
+.kb-card .kb-name { font-weight: 600; font-size: 12px; }
+.kb-card .kb-sub { font-size: 10px; color: var(--text-faint); }
+
+/* ─── TIMELINE ─── */
+.timeline { position: relative; padding-left: 20px; }
+.timeline::before { content: ''; position: absolute; left: 4px; top: 4px; bottom: 4px; width: 1.5px; background: var(--border-soft); }
+.tl-item { position: relative; padding-bottom: 14px; }
+.tl-item:last-child { padding-bottom: 0; }
+.tl-item::before { content: ''; position: absolute; left: -18px; top: 3px; width: 8px; height: 8px; border-radius: 50%; background: var(--tc, var(--teal)); box-shadow: 0 0 0 3px var(--panel-2); }
+.tl-item .tl-title { font-size: 12px; font-weight: 600; }
+.tl-item .tl-meta { font-size: 10.5px; color: var(--text-faint); margin-top: 1px; }
+
+/* ─── REPORTS ─── */
+.report-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+.report-card { background: var(--panel-2); border: 1px solid var(--border-soft); border-radius: 10px; padding: 14px; text-align: center; cursor: pointer; }
+.report-card:hover { border-color: var(--teal-dim); }
+.report-card .rc-icon { font-size: 24px; margin-bottom: 4px; }
+.report-card .rc-name { font-weight: 600; font-size: 12px; }
+.report-card .rc-sub { font-size: 10px; color: var(--text-faint); }
+
+/* ─── DASHBOARD HERO ─── */
+.greeting-hero { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+.gh-label { font-family: var(--font-mono); font-size: 11px; color: var(--text-faint); text-transform: uppercase; letter-spacing: .08em; }
+.greeting-hero h2 { font-size: 22px; margin: 4px 0 6px; }
+.gh-sub { font-size: 12.5px; color: var(--text-dim); }
+
+/* ─── DIVISION HUB ─── */
+.dh-card { display: flex; flex-direction: column; gap: 10px; }
+.dh-head { display: flex; align-items: center; gap: 10px; }
+.dh-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #06231f; flex: none; }
+.dh-name { font-weight: 700; font-size: 14px; }
+.dh-desc { font-size: 11.5px; color: var(--text-faint); line-height: 1.5; }
+.dh-actions { margin-top: auto; }
+
+/* ─── FREELANCERS ─── */
+.freelancer-row { display: flex; align-items: center; gap: 10px; }
+.avatar { width: 34px; height: 34px; border-radius: 9px; background: var(--elevated); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; color: var(--teal); flex: none; }
+.empty-state { text-align: center; padding: 20px; color: var(--text-faint); font-size: 12px; }
+
+/* ─── AUTOMATION ─── */
+.autorule-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border-soft); }
+.autorule-row:last-child { border-bottom: none; }
+.toggle { width: 32px; height: 18px; border-radius: 20px; background: var(--elevated); border: 1px solid var(--border); position: relative; flex: none; }
+.toggle.on { background: rgba(45,212,191,.25); border-color: var(--teal-dim); }
+.toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--text-faint); transition: transform .15s; }
+.toggle.on::after { transform: translateX(14px); background: var(--teal); }
+
+/* ─── CALENDAR ─── */
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal-dow { text-align: center; font-family: var(--font-mono); font-size: 9.5px; color: var(--text-faint); padding: 4px 0; }
+.cal-cell { min-height: 64px; background: var(--panel-2); border: 1px solid var(--border-soft); border-radius: 8px; padding: 4px 5px; font-size: 10px; }
+.cal-cell.faded { opacity: .35; }
+.cal-cell.today { border-color: var(--teal-dim); background: rgba(45,212,191,.06); }
+.cal-cell .d { font-family: var(--font-mono); font-size: 10px; color: var(--text-dim); margin-bottom: 3px; }
+.cal-chip { background: var(--elevated); border-radius: 4px; padding: 1px 4px; margin-bottom: 2px; font-size: 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 </style>
 </head>
 <body>
 
-<div class="app">
+<div class="app" id="appRoot">
   <!-- ============ SIDEBAR ============ -->
   <aside class="sidebar" id="sidebar">
     <div class="brand">
@@ -310,40 +455,38 @@ code.inline{background:var(--elevated);border:1px solid var(--border);padding:1p
       </div>
     </div>
 
-    <nav class="nav">
-      <div class="nav-label">Overview</div>
-      <div class="nav-item active" data-tab="dashboard">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
-        <span>Dashboard</span>
-      </div>
-      <div class="nav-item" data-tab="hub">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="5" r="2.4"/><circle cx="5" cy="19" r="2.4"/><circle cx="19" cy="19" r="2.4"/><path d="M12 7.4V13m0 0-5.6 4.2M12 13l5.6 4.2"/></svg>
-        <span>Division Hub</span>
-      </div>
+    <nav class="nav" id="sidebarNav">
+      <div class="nav-label">Command</div>
+      <div class="nav-item active" data-tab="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span>Command Center</span></div>
+      <div class="nav-item" data-tab="hub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="5" r="2.4"/><circle cx="5" cy="19" r="2.4"/><circle cx="19" cy="19" r="2.4"/><path d="M12 7.4V13m0 0-5.6 4.2M12 13l5.6 4.2"/></svg><span>Division Hub</span></div>
+      <div class="nav-item" data-tab="health"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/></svg><span>Business Health</span></div>
+      <div class="nav-item" data-tab="ops"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg><span>Operations Centre</span></div>
+      <div class="nav-item" data-tab="automation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg><span>Automation</span></div>
 
-      <div class="nav-label">Operations</div>
-      <div class="nav-item" data-tab="crm">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19V6a2 2 0 0 1 2-2h9l5 5v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/><path d="M14 4v4a1 1 0 0 0 1 1h4"/><path d="M8 13h8M8 17h5"/></svg>
-        <span>CRM</span><span class="nav-badge" id="crmOpenBadge">0</span>
-      </div>
-      <div class="nav-item" data-tab="staff">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.2"/><path d="M2.8 19c.6-3.4 3-5.4 6.2-5.4S15.6 15.6 16.2 19"/><circle cx="18" cy="8.5" r="2.4"/><path d="M15.6 13.9c2.6.2 4.4 2 4.9 4.6"/></svg>
-        <span>Staff / HR</span>
-      </div>
-      <div class="nav-item" data-tab="freelancers">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="5" r="2.4"/><path d="M2.8 19c.6-3.4 3-5.4 6.2-5.4S15.6 15.6 16.2 19"/><circle cx="18" cy="8.5" r="2.4"/></svg>
-        <span>Freelancers</span>
-      </div>
-      <div class="nav-item" data-tab="calendar">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>
-        <span>Unified Calendar</span>
-      </div>
+      <div class="nav-label">Growth &amp; Customers</div>
+      <div class="nav-item" data-tab="crm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19V6a2 2 0 0 1 2-2h9l5 5v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/><path d="M14 4v4a1 1 0 0 0 1 1h4"/><path d="M8 13h8M8 17h5"/></svg><span>CRM · Customer 360</span><span class="nav-badge" id="crmBadge">0</span></div>
+      <div class="nav-item" data-tab="approvals"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 12.5 11.2 15 16 9"/><circle cx="12" cy="12" r="9.2"/></svg><span>Approval Centre</span><span class="nav-badge" id="apprBadge">0</span></div>
+
+      <div class="nav-label">Workforce</div>
+      <div class="nav-item" data-tab="staff"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.2"/><path d="M2.8 19c.6-3.4 3-5.4 6.2-5.4S15.6 15.6 16.2 19"/><circle cx="18" cy="8.5" r="2.4"/><path d="M15.6 13.9c2.6.2 4.4 2 4.9 4.6"/></svg><span>Staff / HR Portal</span></div>
+      <div class="nav-item" data-tab="freelancers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="5" r="2.4"/><path d="M2.8 19c.6-3.4 3-5.4 6.2-5.4S15.6 15.6 16.2 19"/><circle cx="18" cy="8.5" r="2.4"/></svg><span>Freelancers</span></div>
+      <div class="nav-item" data-tab="fleet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 16V9l2.5-4h9L17 9h4v7h-2a2.5 2.5 0 0 1-5 0H10a2.5 2.5 0 0 1-5 0H3Z"/></svg><span>Fleet Management</span></div>
+
+      <div class="nav-label">Finance &amp; Assets</div>
+      <div class="nav-item" data-tab="finance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v20M17 6.5c0-1.9-2.2-3-5-3s-5 1.2-5 3 2.2 2.7 5 3 5 1.1 5 3-2.2 3-5 3-5-1.1-5-3"/></svg><span>Finance</span></div>
+      <div class="nav-item" data-tab="assets"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg><span>Asset Centre</span></div>
+      <div class="nav-item" data-tab="procurement"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h2l2.2 11.4a2 2 0 0 0 2 1.6h7.1a2 2 0 0 0 2-1.6L21 8H6.4"/><circle cx="10" cy="21" r="1.3"/><circle cx="17" cy="21" r="1.3"/></svg><span>Procurement</span></div>
+
+      <div class="nav-label">Intelligence</div>
+      <div class="nav-item" data-tab="ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="5" width="16" height="12" rx="3"/><path d="M9 21h6M12 17v4M8.5 10.5h.01M15.5 10.5h.01"/></svg><span>MG AI Assistant</span><span class="nav-badge">Beta</span></div>
+      <div class="nav-item" data-tab="reports"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M9 12h6M9 16h6M9 8h2"/></svg><span>Reports</span></div>
+      <div class="nav-item" data-tab="security"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2 4 5v6c0 5 3.4 8.7 8 11 4.6-2.3 8-6 8-11V5l-8-3Z"/></svg><span>Security Centre</span></div>
+      <div class="nav-item" data-tab="knowledge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5v-15Z"/><path d="M8 8h8M8 11.5h8"/></svg><span>Knowledge Base</span></div>
 
       <div class="nav-label">System</div>
-      <div class="nav-item" data-tab="settings">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.6 7.6 0 0 0 0-2l2-1.5-2-3.4-2.3.9a7.6 7.6 0 0 0-1.8-1L15 3.4h-4l-.3 2.4a7.6 7.6 0 0 0-1.8 1l-2.3-.9-2 3.4L6.6 11a7.6 7.6 0 0 0 0 2l-2 1.5 2 3.4 2.3-.9c.5.4 1.1.8 1.8 1l.3 2.4h4l.3-2.4c.7-.2 1.3-.6 1.8-1l2.3.9 2-3.4-2-1.5Z"/></svg>
-        <span>Settings</span>
-      </div>
+      <div class="nav-item" data-tab="audit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 3h6l4 4v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M9 11h6M9 15h4"/></svg><span>Audit Trail</span></div>
+      <div class="nav-item" data-tab="calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span>Unified Calendar</span></div>
+      <div class="nav-item" data-tab="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.6 7.6 0 0 0 0-2l2-1.5-2-3.4-2.3.9a7.6 7.6 0 0 0-1.8-1L15 3.4h-4l-.3 2.4a7.6 7.6 0 0 0-1.8 1l-2.3-.9-2 3.4L6.6 11a7.6 7.6 0 0 0 0 2l-2 1.5 2 3.4 2.3-.9c.5.4 1.1.8 1.8 1l.3 2.4h4l.3-2.4c.7-.2 1.3-.6 1.8-1l2.3.9 2-3.4-2-1.5Z"/></svg><span>Settings</span></div>
     </nav>
 
     <div class="sidebar-foot">
@@ -355,25 +498,55 @@ code.inline{background:var(--elevated);border:1px solid var(--border);padding:1p
   <!-- ============ MAIN ============ -->
   <main class="main">
     <div class="topbar">
-      <div style="display:flex;gap:10px;align-items:flex-start;">
+      <div class="topbar-left">
         <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
         </button>
         <div>
-          <h1 id="pageTitle">Dashboard</h1>
-          <div class="sub" id="pageSub">Live group-wide view — stats from real systems.</div>
+          <h1 id="pageTitle">Command Center</h1>
+          <span class="sub" id="pageSub">Good Morning, Moses.</span>
         </div>
       </div>
-      <div class="top-actions" id="topActions"></div>
+      <div class="top-actions">
+        <div class="gsearch">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input id="globalSearchInput" placeholder="Search everything..." onclick="openSearchModal()" readonly>
+          <span class="gsearch-kbd">⌘K</span>
+        </div>
+        <div class="notif-wrap">
+          <button class="notif-btn" id="notifToggle" onclick="toggleNotif()">
+            🔔
+            <span class="notif-dot" id="notifDot">0</span>
+          </button>
+          <div class="notif-panel" id="notifPanel">
+            <div class="notif-panel-head"><b>Notifications</b><span id="notifMarkAll">Mark all read</span></div>
+            <div class="notif-list" id="notifList"></div>
+            <div class="notif-panel-foot"><a onclick="setTab('audit')">View all notifications →</a></div>
+          </div>
+        </div>
+        <button class="avatar-btn" id="userAvatar" onclick="toggleAuth()">M</button>
+      </div>
     </div>
 
+    <div id="topActions" style="display:none;"></div>
     <div id="view"></div>
 
     <div class="footer-note">
-      <span>Mbulaheni Group Integrated Solutions — governed by SOP Manual v2.0</span>
+      <span>MGIS OS v5.1 · Mbulaheni Group Integrated Solutions · Multi-Tenant Engine (Production Mode)</span>
       <span id="clockFoot">—</span>
     </div>
   </main>
+</div>
+
+<!-- ============ SEARCH MODAL ============ -->
+<div class="search-overlay" id="searchOverlay">
+  <div class="search-modal">
+    <div class="sm-input">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="searchInput" placeholder="Search customers, invoices, staff, tickets, assets..." autofocus>
+    </div>
+    <div class="sm-results" id="searchResults"></div>
+  </div>
 </div>
 
 <!-- ============ MODAL ============ -->
@@ -381,21 +554,15 @@ code.inline{background:var(--elevated);border:1px solid var(--border);padding:1p
   <div class="modal" id="modalBody"></div>
 </div>
 
-<!-- ============================================================ -->
-<!-- ======================== JAVASCRIPT ========================= -->
-<!-- ============================================================ -->
 <script>
-/* =========================================================================
-   MBULAHENI GROUP CENTRAL OS — PRODUCTION v4.0
-   =========================================================================
-   Hardcoded Firebase Config (secure)
-   Atomic counters via Firestore transaction
-   Firestore Timestamp support
-   Full Freelancer + Activity tracking
-   Unified calendar
-========================================================================= */
+// ========================================================================
+//  MBULAHENI GROUP — CENTRAL OS v5.1 (PRODUCTION MODE)
+//  All primary collections read/write real Firestore data. No client-side
+//  seed arrays remain for CRM, approvals, fleet, assets, or audit — empty
+//  states render as empty states, not fake demo rows.
+// ========================================================================
 
-// ─── HARDCODED PRODUCTION FIREBASE CONFIG ──────────────────────────
+// ─── FIREBASE CONFIG ──────────────────────────────────────────────────
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyBpoDnbWKvWQdvcZnhUZwFr24iox2fWJto",
   authDomain: "test-bot-49f99.firebaseapp.com",
@@ -408,13 +575,14 @@ const FIREBASE_CONFIG = {
 
 // ─── CONSTANTS ──────────────────────────────────────────────────────
 const ADMIN_EMAILS = ['admin@mbulahenigroup.co.za', 'ronewa@cyberit.co.za'];
-const LS_PREFIX = 'mgcentral_';
 
-const DEFAULT_DIVISIONS = [
-  { id: 'citm', name: 'Cyber I.T. Masters', short: 'IT', desc: 'Managed IT, cybersecurity, M365 & support.', url: 'https://cyberit.mbulahenigroup.co.za/admin', color: '#2dd4bf', kind: 'msp' },
-  { id: 'mgfc', name: 'MG Facility & Cleaning', short: 'MGFC', desc: 'Cleaning & facilities operations.', url: 'https://mgcleaning.mbulahenigroup.co.za/admin', color: '#f2a541', kind: 'cleaning' },
-  { id: 'nexus', name: 'NEXUS Tech Store', short: 'NX', desc: 'Retail & e-commerce storefront.', url: '', color: '#a78bfa', kind: 'retail' },
-  { id: 'group', name: 'Group / Sales & BD', short: 'BD', desc: 'Business development, tenders, sales.', url: '', color: '#5eaaff', kind: 'sales' }
+const DIVISIONS = [
+  { id: 'citm', name: 'Cyber I.T. Masters', short: 'IT', color: '#2dd4bf', kind: 'msp', status: 'healthy', desc: 'Managed IT, cybersecurity' },
+  { id: 'mgfc', name: 'MG Facility & Cleaning', short: 'MGFC', color: '#f2a541', kind: 'cleaning', status: 'busy', desc: 'Cleaning & facilities' },
+  { id: 'nexus', name: 'NEXUS Tech Store', short: 'NX', color: '#a78bfa', kind: 'retail', status: 'healthy', desc: 'Retail & e-commerce' },
+  { id: 'group', name: 'Group / Sales & BD', short: 'BD', color: '#5eaaff', kind: 'sales', status: 'healthy', desc: 'Business development' },
+  { id: 'fuel', name: 'Fuel Division', short: 'FUEL', color: '#f97316', kind: 'other', status: 'coming', desc: 'Fuel supply (Coming Soon)' },
+  { id: 'construction', name: 'Construction', short: 'CON', color: '#8b5cf6', kind: 'other', status: 'planning', desc: 'Building & infrastructure' }
 ];
 
 const CRM_TYPES = [
@@ -424,8 +592,10 @@ const CRM_TYPES = [
   { id: 'complaint', label: 'Complaint', statuses: ['Open','Investigating','Resolved','Closed'] },
   { id: 'rating', label: 'Service rating', statuses: ['Logged'] }
 ];
-const SEVERITIES = ['Critical','High','Medium','Low'];
-const ACTIVITY_TYPES = ['Sales call/visit','Quotation submitted','Job card completed','Marketing task','Client follow-up','Site visit','Admin/other'];
+
+const APPROVAL_TYPES = ['Leave', 'Purchase Order', 'Invoice', 'Refund', 'Expense', 'Other'];
+const ASSET_STATUSES = ['Active', 'Maintenance', 'Retired', 'Lost/Stolen'];
+const FLEET_STATUSES = ['Active', 'Service', 'Idle', 'Retired'];
 
 // ─── STATE ──────────────────────────────────────────────────────────
 let state = {
@@ -435,987 +605,1204 @@ let state = {
   auth: null,
   user: null,
   isAdmin: false,
-  divisions: [],
+  divisions: DIVISIONS,
   crm: [],
   freelancers: [],
   tasks: [],
   activity: [],
   employees: [],
-  stats: {
-    citm: { openTickets:0, critical:0, slaBreaches:0 },
-    mgfc: { jobsToday:0, sitesActive:0, staffDeployed:0, openIssues:0 },
-    nexus: { metric1:0, metric2:0, metric1Label:'Orders today', metric2Label:'Pending fulfilment' },
-    group: { metric1:0, metric2:0, metric1Label:'Deals in pipeline', metric2Label:'Tenders submitted' }
-  },
+  assets: [],
+  approvals: [],
+  notifications: [],
+  fleet: [],
+  procurement: [],
+  knowledge: [],
+  audit: [],
+  tickets: [],           // mg_tickets — real support tickets for CITM
+  mgfcJobs: [],          // mg_mgfc_jobs — real cleaning jobs for MGFC
+  calMonth: new Date(),
   crmFilter: 'all',
-  crmStatusFilter: 'all',
-  calMonth: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+  crmStatusFilter: 'all'
 };
 
 // ─── UTILITY ────────────────────────────────────────────────────────
-function el(html){ const d=document.createElement('div'); d.innerHTML=html.trim(); return d.firstElementChild; }
-function esc(s){ return (s===undefined||s===null) ? '' : String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function fmtDate(ts){ if(!ts) return '—'; const d=typeof ts==='number'?new Date(ts):new Date(ts); if(isNaN(d))return '—'; return d.toLocaleDateString('en-ZA',{day:'2-digit',month:'short',year:'numeric'}); }
-function todayISO(){ return new Date().toISOString().slice(0,10); }
-function statusBadgeClass(s){ const st=(s||'').toLowerCase(); if(['won','paid','resolved','closed','accepted','done'].includes(st)) return 'b-done'; if(['lost','overdue','rejected','expired'].includes(st)) return 'b-lost'; if(['new','draft','logged'].includes(st)) return 'b-new'; return 'b-progress'; }
-function divisionById(id){ return state.divisions.find(d=>d.id===id) || {name:id, color:'#5c6b83', short:'—'}; }
-function crmTypeMeta(id){ return CRM_TYPES.find(t=>t.id===id) || CRM_TYPES[0]; }
-function uid(){ return Math.random().toString(36).slice(2,10); }
-function isAdminEmail(email){ return email && ADMIN_EMAILS.includes(email.toLowerCase()); }
+function el(html) { const d = document.createElement('div'); d.innerHTML = html.trim(); return d.firstElementChild; }
+function esc(s) { return (s === undefined || s === null) ? '' : String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+function fmtDate(ts) { if (!ts) return '—'; const d = typeof ts === 'number' ? new Date(ts) : new Date(ts); if (isNaN(d)) return '—'; return d.toLocaleDateString('en-ZA', { day: '2-digit', month: 'short', year: 'numeric' }); }
+function todayISO() { return new Date().toISOString().slice(0, 10); }
+function uid() { return Math.random().toString(36).slice(2, 8); }
+function isAdminEmail(email) { return email && ADMIN_EMAILS.includes(email.toLowerCase()); }
+function divisionById(id) { return state.divisions.find(d => d.id === id) || { name: id, color: '#5c6b83', short: '—', kind: 'other' }; }
+function crmTypeMeta(id) { return CRM_TYPES.find(t => t.id === id) || CRM_TYPES[0]; }
+function canWrite() { return !!(state.user && state.firebaseReady); }
 
-// ─── FIX: Firestore Timestamp helper ──────────────────────────────
-function getDateValue(input) {
-  if (!input) return null;
-  // Firestore Timestamp
-  if (input.toDate && typeof input.toDate === 'function') return input.toDate();
-  // JS Date or string
-  const d = new Date(input);
-  return isNaN(d.getTime()) ? null : d;
+function toast(msg) {
+  let t = document.getElementById('mgToast');
+  if (!t) { t = el(`<div id="mgToast"></div>`); document.body.appendChild(t); }
+  t.textContent = msg; t.style.opacity = '1'; clearTimeout(t._h); t._h = setTimeout(() => { t.style.opacity = '0'; }, 2200);
 }
 
-function toast(msg){
-  let t=document.getElementById('mgToast');
-  if(!t){ t=el(`<div id="mgToast" style="position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--elevated);border:1px solid var(--border);color:var(--text);padding:10px 18px;border-radius:9px;font-size:12.5px;font-family:var(--font-mono);z-index:200;opacity:0;transition:opacity .2s;box-shadow:0 12px 30px rgba(0,0,0,.4);"></div>`); document.body.appendChild(t); }
-  t.textContent=msg; t.style.opacity='1'; clearTimeout(t._h); t._h=setTimeout(()=>{ t.style.opacity='0'; }, 2200);
-}
-
-// ─── MODAL ──────────────────────────────────────────────────────────
-function openModal(html){
-  document.getElementById('modalBody').innerHTML = html;
-  document.getElementById('overlay').classList.remove('hidden');
-}
-function closeModal(){
-  document.getElementById('overlay').classList.add('hidden');
-  document.getElementById('modalBody').innerHTML = '';
-}
-document.getElementById('overlay').addEventListener('click', (e)=>{ if(e.target.id==='overlay') closeModal(); });
+function openModal(html) { document.getElementById('modalBody').innerHTML = html; document.getElementById('overlay').classList.remove('hidden'); }
+function closeModal() { document.getElementById('overlay').classList.add('hidden'); document.getElementById('modalBody').innerHTML = ''; }
+document.getElementById('overlay').addEventListener('click', (e) => { if (e.target.id === 'overlay') closeModal(); });
 
 // ─── AUTH ───────────────────────────────────────────────────────────
-async function signIn(email, pass){
-  if(!state.auth) { toast('Firebase not initialized'); return; }
-  try {
-    await state.auth.signInWithEmailAndPassword(email, pass);
-    toast(`Welcome, ${email}`);
-  } catch(e){ toast('Login failed: '+e.message); }
+async function signIn(email, pass) {
+  if (!state.auth) { toast('Firebase not initialized'); return; }
+  try { await state.auth.signInWithEmailAndPassword(email, pass); toast(`Welcome, ${email}`); } catch (e) { toast('Login failed: ' + e.message); }
 }
-async function signOut(){
-  if(!state.auth) return;
-  await state.auth.signOut();
-  toast('Signed out');
-  await refreshAll();
-  render();
+async function signOut() { if (!state.auth) return; await state.auth.signOut(); toast('Signed out'); await refreshAll(); render(); }
+
+function toggleAuth() {
+  if (state.user) { signOut(); } else { openAuthModal(); }
+}
+function openAuthModal() {
+  openModal(`
+    <h3>🔐 Sign In</h3>
+    <div class="modal-sub">Admin access required for write operations. Note: this front-end allowlist is a UX convenience only — real access control is enforced by Firestore Security Rules (see Settings).</div>
+    <div class="field"><label>Email</label><input id="loginEmail" placeholder="admin@mbulahenigroup.co.za"></div>
+    <div class="field"><label>Password</label><input id="loginPass" type="password" placeholder="••••••••"></div>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn primary" id="loginBtn">Sign in</button>
+    </div>
+  `);
+  document.getElementById('loginBtn').onclick = () => {
+    const e = document.getElementById('loginEmail').value;
+    const p = document.getElementById('loginPass').value;
+    if (e && p) { signIn(e, p); closeModal(); } else toast('Enter email and password');
+  };
 }
 
-// ─── STORE (Firestore + local fallback) ───────────────────────────
-function localGet(coll){ try{ return JSON.parse(localStorage.getItem(LS_PREFIX+coll) || '[]'); }catch(e){ return []; } }
-function localSet(coll, arr){ localStorage.setItem(LS_PREFIX+coll, JSON.stringify(arr)); }
-
+// ─── STORE (PRODUCTION MODE — NO localStorage FALLBACK, NO SEED DATA) ─
 const Store = {
-  async list(coll){
-    if(state.firebaseReady && state.db){
-      try{
-        const snap = await state.db.collection(coll).get();
-        return snap.docs.map(d=>({id:d.id, ...d.data()}));
-      }catch(e){ console.warn('Firestore list fallback', e); return localGet(coll); }
+  async list(coll) {
+    if (!state.firebaseReady || !state.db) {
+      console.warn(`[Store] Firebase not ready, returning empty array for "${coll}"`);
+      return [];
     }
-    return localGet(coll);
+    try {
+      const snap = await state.db.collection(coll).get();
+      return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    } catch (e) {
+      console.error(`[Store] Failed to read "${coll}":`, e);
+      return [];
+    }
   },
-  async add(coll, data){
+  async add(coll, data) {
+    if (!state.firebaseReady || !state.db || !state.user) {
+      throw new Error('You must be signed in to create records.');
+    }
     data._createdAt = Date.now();
-    if(state.firebaseReady && state.db && state.user){
-      data._owner = state.user.uid;
-      data._ownerEmail = state.user.email;
-      const ref = await state.db.collection(coll).add(data);
-      return ref.id;
-    } else {
-      const arr = localGet(coll);
-      const id = 'local_'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
-      arr.unshift({id, ...data});
-      localSet(coll, arr);
-      return id;
-    }
+    data._owner = state.user.uid;
+    data._ownerEmail = state.user.email;
+    const ref = await state.db.collection(coll).add(data);
+    await logAudit(`Created ${coll.replace('mg_','')}`, data.name || data.client || data.title || ref.id);
+    return ref.id;
   },
-  async update(coll, id, data){
+  async update(coll, id, data) {
+    if (!state.firebaseReady || !state.db || !state.user) {
+      throw new Error('You must be signed in to update records.');
+    }
     data._updatedAt = Date.now();
-    if(state.firebaseReady && state.db && state.user){
-      await state.db.collection(coll).doc(id).update(data);
-      return;
-    } else {
-      const arr = localGet(coll);
-      const idx = arr.findIndex(x=>x.id===id);
-      if(idx>-1){ arr[idx]={...arr[idx], ...data}; localSet(coll, arr); }
-    }
+    data._updatedBy = state.user.email;
+    await state.db.collection(coll).doc(id).update(data);
+    await logAudit(`Updated ${coll.replace('mg_','')}`, id);
   },
-  async set(coll, id, data){
-    if(state.firebaseReady && state.db && state.user){
-      await state.db.collection(coll).doc(id).set(data, {merge:true});
-      return;
-    } else {
-      const arr = localGet(coll);
-      const idx = arr.findIndex(x=>x.id===id);
-      if(idx>-1){ arr[idx]={...arr[idx], ...data}; } else { arr.push({id, ...data}); }
-      localSet(coll, arr);
+  async set(coll, id, data) {
+    if (!state.firebaseReady || !state.db || !state.user) {
+      throw new Error('You must be signed in to update records.');
     }
+    await state.db.collection(coll).doc(id).set(data, { merge: true });
   },
-  async remove(coll, id){
-    if(state.firebaseReady && state.db && state.user){
-      await state.db.collection(coll).doc(id).delete();
-      return;
-    } else {
-      localSet(coll, localGet(coll).filter(x=>x.id!==id));
+  async remove(coll, id) {
+    if (!state.firebaseReady || !state.db || !state.user) {
+      throw new Error('You must be signed in to delete records.');
     }
+    await state.db.collection(coll).doc(id).delete();
+    await logAudit(`Deleted ${coll.replace('mg_','')}`, id);
   }
 };
 
-// ─── FIX: Atomic counter for CRM refs (Firestore transaction) ────
-async function getNextRef(divisionId, typeId){
-  if(!state.db) return 'ERR-000';
-  const docRef = state.db.collection('mg_meta').doc('counters');
+// ─── AUDIT LOGGING (real, writes to mg_audit) ─────────────────────
+async function logAudit(action, target) {
+  if (!state.firebaseReady || !state.db || !state.user) return;
   try {
-    const result = await state.db.runTransaction(async (transaction) => {
-      const doc = await transaction.get(docRef);
-      const data = doc.exists ? doc.data() : {};
-      const key = `${divisionId}_${typeId}`;
-      const next = (data[key] || 0) + 1;
-      transaction.set(docRef, { [key]: next }, { merge: true });
-      const prefix = (divisionById(divisionId).short || 'MG').toUpperCase();
-      const typeLetter = { enquiry:'E', quotation:'Q', invoice:'I', complaint:'C', rating:'R' }[typeId] || 'X';
-      const year = new Date().getFullYear();
-      return `${prefix}-${typeLetter}-${year}-${String(next).padStart(3, '0')}`;
+    await state.db.collection('mg_audit').add({
+      action, target: String(target || '—'),
+      user: state.user.email,
+      timestamp: Date.now()
     });
-    return result;
-  } catch(e) {
-    console.error('Counter transaction failed:', e);
-    // fallback to non-atomic (but better than crashing)
-    const prefix = (divisionById(divisionId).short || 'MG').toUpperCase();
-    const typeLetter = { enquiry:'E', quotation:'Q', invoice:'I', complaint:'C', rating:'R' }[typeId] || 'X';
-    const year = new Date().getFullYear();
-    const count = state.crm.filter(r=>r.division===divisionId && r.type===typeId).length + 1;
-    return `${prefix}-${typeLetter}-${year}-${String(count).padStart(3, '0')}`;
+  } catch (e) { console.warn('[Audit] failed to log', e); }
+}
+
+// ─── REFRESH ────────────────────────────────────────────────────────
+async function refreshAll() {
+  try {
+    const [crm, freelancers, activity, tasks, employees, assets, approvals, fleet, procurement, knowledge, audit, tickets, mgfcJobs] = await Promise.all([
+      Store.list('mg_crm'), Store.list('mg_freelancers'), Store.list('mg_activity'), Store.list('mg_tasks'),
+      Store.list('mg_employees'), Store.list('mg_assets'), Store.list('mg_approvals'), Store.list('mg_fleet'),
+      Store.list('mg_procurement'), Store.list('mg_knowledge'), Store.list('mg_audit'),
+      Store.list('mg_tickets'), Store.list('mg_mgfc_jobs')
+    ]);
+    state.crm = crm; state.freelancers = freelancers; state.activity = activity; state.tasks = tasks;
+    state.employees = employees; state.assets = assets; state.approvals = approvals; state.fleet = fleet;
+    state.procurement = procurement; state.knowledge = knowledge;
+    state.audit = audit.sort((a,b) => (b.timestamp||0) - (a.timestamp||0));
+    state.tickets = tickets; state.mgfcJobs = mgfcJobs;
+  } catch (e) {
+    console.warn('Refresh failed:', e);
   }
-}
-
-// ─── COMPUTE LIVE STATS (with bug fixes) ──────────────────────────
-async function computeLiveStats(){
-  if(!state.firebaseReady || !state.db) return;
-
-  // --- IT (tickets) ---
-  try {
-    const itSnap = await state.db.collection('tickets').get();
-    const itTickets = itSnap.docs.map(d => d.data());
-    const open = itTickets.filter(t => t.status !== 'closed' && t.status !== 'resolved').length;
-    const critical = itTickets.filter(t => t.priority === 'Urgent' && t.status !== 'closed').length;
-    const now = Date.now();
-    let slaBreach = 0;
-    itTickets.forEach(t => {
-      if (t.status === 'closed' || t.status === 'resolved') return;
-      const createdDate = getDateValue(t.createdAt);
-      if (!createdDate) return;
-      const created = createdDate.getTime();
-      const hours = { Urgent:4, High:8, Medium:24, Low:48 }[t.priority] || 24;
-      if ((now - created) > hours * 3600 * 1000) slaBreach++;
-    });
-    state.stats.citm = { openTickets: open, critical, slaBreaches: slaBreach };
-  } catch(e) { console.warn('IT stats failed', e); }
-
-  // --- Cleaning (mgfc_tickets) ───
-  // FIXED: explicit parentheses around priority check
-  try {
-    const cleanSnap = await state.db.collection('mgfc_tickets').get();
-    const cleanTickets = cleanSnap.docs.map(d => d.data());
-    const today = todayISO();
-    const jobsToday = cleanTickets.filter(t => t.scheduledDate === today || t.requestedDate === today).length;
-    const sitesActive = new Set(cleanTickets.filter(t => t.status !== 'cancelled' && t.status !== 'closed').map(t => t.address)).size;
-    const staffDeployed = new Set(cleanTickets.filter(t => t.status === 'scheduled' || t.status === 'in-progress').map(t => t.assignedTeam)).size;
-    // FIXED: properly parenthesized
-    const openIssues = cleanTickets.filter(t =>
-      t.status !== 'closed' &&
-      t.status !== 'cancelled' &&
-      (t.priority === 'High' || t.priority === 'Urgent')
-    ).length;
-    state.stats.mgfc = { jobsToday, sitesActive, staffDeployed, openIssues };
-  } catch(e) { console.warn('Cleaning stats failed', e); }
-}
-
-// ─── BOOTSTRAP & REFRESH ──────────────────────────────────────────
-async function bootstrapDivisions(){
-  let divs = await Store.list('mg_divisions');
-  if(!divs.length){ for(const d of DEFAULT_DIVISIONS){ await Store.set('mg_divisions', d.id, d); } divs = await Store.list('mg_divisions'); }
-  state.divisions = divs.sort((a,b)=> DEFAULT_DIVISIONS.findIndex(x=>x.id===a.id) - DEFAULT_DIVISIONS.findIndex(x=>x.id===b.id));
-}
-
-async function refreshAll(){
-  await bootstrapDivisions();
-  state.crm = await Store.list('mg_crm');
-  state.freelancers = await Store.list('mg_freelancers');
-  state.activity = await Store.list('mg_activity');
-  state.tasks = await Store.list('mg_tasks');
-  state.employees = await Store.list('mg_employees');
-  await computeLiveStats();
-  updateNavBadges();
+  computeDashboardStats();
+  computeHealthScores();
+  updateBadges();
   updateSidebarAuth();
+  updateNotifs();
 }
 
-function updateNavBadges(){
-  const open = state.crm.filter(r=> !['won','lost','resolved','closed','paid','rejected','expired','logged'].includes((r.status||'').toLowerCase())).length;
-  document.getElementById('crmOpenBadge').textContent = open;
+// ─── REAL DASHBOARD STATS (computed from live collections, no hardcoding) ─
+function computeDashboardStats() {
+  const paidOrDone = ['paid','resolved','closed','won'];
+  const citmRevenue = state.crm.filter(r => r.division === 'citm' && r.type === 'invoice' && r.status === 'Paid').reduce((a,c) => a + Number(c.amount||0), 0);
+  const mgfcRevenue = state.crm.filter(r => r.division === 'mgfc' && r.type === 'invoice' && r.status === 'Paid').reduce((a,c) => a + Number(c.amount||0), 0);
+  const otherRevenue = state.crm.filter(r => !['citm','mgfc'].includes(r.division) && r.type === 'invoice' && r.status === 'Paid').reduce((a,c) => a + Number(c.amount||0), 0);
+
+  const openTickets = state.tickets.filter(t => !['resolved','closed'].includes((t.status||'').toLowerCase()));
+  const criticalTickets = openTickets.filter(t => (t.priority||'').toLowerCase() === 'critical');
+  const slaBreaches = openTickets.filter(t => t.slaBreached).length;
+
+  const jobsToday = state.mgfcJobs.filter(j => j.date === todayISO());
+  const sitesActive = new Set(jobsToday.map(j => j.site)).size;
+  const staffDeployed = new Set(jobsToday.flatMap(j => j.staff || [])).size;
+  const mgfcOpenIssues = state.mgfcJobs.filter(j => (j.status||'').toLowerCase() === 'issue').length;
+
+  state.stats = {
+    citm: { openTickets: openTickets.length, critical: criticalTickets.length, slaBreaches, revenue: citmRevenue, profit: Math.round(citmRevenue * 0.29) },
+    mgfc: { jobsToday: jobsToday.length, sitesActive, staffDeployed, openIssues: mgfcOpenIssues, revenue: mgfcRevenue, profit: Math.round(mgfcRevenue * 0.27) },
+    nexus: { metric1: 0, metric2: 0, metric1Label: 'Orders today', metric2Label: 'Pending fulfilment' },
+    group: {
+      metric1: state.crm.filter(r => r.type === 'enquiry' && r.status === 'New').length,
+      metric2: state.crm.filter(r => r.type === 'quotation' && ['Draft','Sent'].includes(r.status)).length,
+      metric1Label: 'New leads', metric2Label: 'Outstanding quotes'
+    },
+    _totalRevenue: citmRevenue + mgfcRevenue + otherRevenue,
+    _hasTicketData: state.tickets.length > 0,
+    _hasJobData: state.mgfcJobs.length > 0
+  };
 }
-function updateSidebarAuth(){
+
+function computeHealthScores() {
+  const s = state.stats;
+  state.health = {};
+  state.divisions.forEach(d => {
+    const dStats = s[d.id] || {};
+    const csatRatings = state.crm.filter(r => r.division === d.id && r.type === 'rating' && r.rating);
+    const csat = csatRatings.length ? (csatRatings.reduce((a,c) => a + Number(c.rating||0), 0) / csatRatings.length) * 20 : null;
+    const openQuotes = state.crm.filter(r => r.division === d.id && r.type === 'quotation' && ['Draft','Sent'].includes(r.status)).length;
+    const overdueInvoices = state.crm.filter(r => r.division === d.id && r.type === 'invoice' && r.status === 'Overdue').length;
+
+    const metrics = {};
+    metrics.revenue = dStats.revenue ? Math.min(100, (dStats.revenue / 120000) * 100) : null;
+    metrics.sla = dStats.slaBreaches !== undefined && dStats.openTickets !== undefined && dStats.openTickets > 0
+      ? Math.max(30, 100 - (dStats.slaBreaches * 15)) : (dStats.openIssues !== undefined ? Math.max(40, 100 - (dStats.openIssues * 12)) : null);
+    metrics.csat = csat;
+    metrics.invoicing = state.crm.filter(r => r.division === d.id && r.type === 'invoice').length ? Math.max(30, 100 - (overdueInvoices * 15)) : null;
+
+    const known = Object.entries(metrics).filter(([,v]) => v !== null && v !== undefined);
+    const score = known.length ? Math.round(known.reduce((a,[,v]) => a + v, 0) / known.length) : null;
+    state.health[d.id] = { metrics, score, hasData: known.length > 0 };
+  });
+}
+
+function updateBadges() {
+  const open = state.crm.filter(r => !['won','lost','resolved','closed','paid','rejected','expired','logged'].includes((r.status||'').toLowerCase())).length;
+  document.getElementById('crmBadge').textContent = open;
+  const pending = state.approvals.filter(a => a.status === 'Pending').length;
+  document.getElementById('apprBadge').textContent = pending;
+  const unread = state.notifications.filter(n => !n.read).length;
+  document.getElementById('notifDot').textContent = unread;
+}
+
+function updateSidebarAuth() {
   const el = document.getElementById('whoamiDisplay');
-  if(state.user){
+  if (state.user) {
     const admin = isAdminEmail(state.user.email);
-    el.innerHTML = `<span style="color:var(--text-dim)">Signed in as</span><br><b style="color:var(--text)">${esc(state.user.email)}</b> ${admin?'<span style="color:var(--teal);font-size:10px;font-weight:700;">⚡ Admin</span>':''}`;
-  } else {
-    el.innerHTML = `Not signed in <span style="font-size:10px;color:var(--text-faint);">(read-only)</span>`;
-  }
+    el.innerHTML = `<span style="color:var(--text-dim)">Signed in as</span><br><b style="color:var(--text)">${esc(state.user.email)}</b> ${admin ? '<span style="color:var(--teal);font-size:10px;font-weight:700;">⚡ Admin</span>' : ''}`;
+  } else { el.innerHTML = 'Not signed in <span style="font-size:10px;color:var(--text-faint);">(read-only)</span>'; }
 }
 
-// ─── FIREBASE INIT (hardcoded config) ─────────────────────────────
-async function initFirebase(){
+// Notifications are derived live from real data (overdue invoices, critical tickets, pending approvals)
+// rather than a hardcoded seed array.
+function updateNotifs() {
+  const notifs = [];
+  state.crm.filter(r => r.type === 'invoice' && r.status === 'Overdue').slice(0, 5).forEach(r => {
+    notifs.push({ id: 'inv_' + r.id, read: false, type: 'alert', icon: '🟠', title: 'Invoice Overdue', detail: `${r.ref || r.client || 'Invoice'} — R${Number(r.amount||0).toLocaleString()}`, time: fmtDate(r._createdAt) });
+  });
+  state.tickets.filter(t => (t.priority||'').toLowerCase() === 'critical' && !['resolved','closed'].includes((t.status||'').toLowerCase())).slice(0, 5).forEach(t => {
+    notifs.push({ id: 'tix_' + t.id, read: false, type: 'alert', icon: '🔴', title: 'Critical Ticket', detail: t.title || t.ref || 'Open ticket', time: fmtDate(t._createdAt) });
+  });
+  state.approvals.filter(a => a.status === 'Pending').slice(0, 5).forEach(a => {
+    notifs.push({ id: 'appr_' + a.id, read: false, type: 'task', icon: '🟣', title: `${a.type || 'Approval'} pending`, detail: a.requester || '—', time: fmtDate(a._createdAt) });
+  });
+  state.crm.filter(r => r.type === 'quotation' && r.status === 'Accepted').slice(0, 3).forEach(r => {
+    notifs.push({ id: 'quo_' + r.id, read: true, type: 'task', icon: '🟢', title: 'Quote Accepted', detail: r.ref || r.client || '—', time: fmtDate(r._createdAt) });
+  });
+  state.notifications = notifs;
+  document.getElementById('notifDot').textContent = notifs.filter(n => !n.read).length;
+  renderNotifs();
+}
+
+function renderNotifs() {
+  const list = document.getElementById('notifList');
+  if (!state.notifications.length) { list.innerHTML = `<div style="padding:24px 16px;text-align:center;color:var(--text-faint);font-size:12px;">No notifications. All quiet.</div>`; return; }
+  list.innerHTML = state.notifications.slice(0, 10).map(n => `
+    <div class="notif-item" onclick="markNotif('${n.id}')">
+      <span style="font-size:15px;">${n.icon}</span>
+      <div class="notif-body">
+        <b>${esc(n.title)}</b>
+        <span>${esc(n.detail)}</span>
+        <span style="display:block;font-size:9px;color:var(--text-faint);margin-top:2px;">${esc(n.time)}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function markNotif(id) {
+  const n = state.notifications.find(x => x.id === id);
+  if (n) { n.read = true; updateNotifs(); }
+}
+function toggleNotif() {
+  document.getElementById('notifPanel').classList.toggle('open');
+}
+document.addEventListener('click', (e) => {
+  const panel = document.getElementById('notifPanel');
+  const btn = document.getElementById('notifToggle');
+  if (!panel.contains(e.target) && !btn.contains(e.target)) panel.classList.remove('open');
+});
+document.getElementById('notifMarkAll').onclick = () => {
+  state.notifications.forEach(n => n.read = true);
+  updateNotifs();
+  document.getElementById('notifDot').textContent = 0;
+  toast('All notifications marked read');
+};
+
+// ─── SEARCH ─────────────────────────────────────────────────────────
+function openSearchModal() {
+  document.getElementById('searchOverlay').classList.toggle('open');
+  setTimeout(() => document.getElementById('searchInput').focus(), 100);
+}
+document.addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); openSearchModal(); }
+  if (e.key === 'Escape') document.getElementById('searchOverlay').classList.remove('open');
+});
+document.getElementById('searchInput').addEventListener('input', function() {
+  const q = this.value.toLowerCase().trim();
+  const results = document.getElementById('searchResults');
+  if (!q) { results.innerHTML = '<div style="padding:20px;color:var(--text-faint);text-align:center;">Type to search customers, tickets, staff, assets…</div>'; return; }
+  const items = [];
+  state.crm.forEach(r => { if (r.client?.toLowerCase().includes(q) || r.ref?.toLowerCase().includes(q)) items.push({ icon: '📄', name: r.client || r.ref, sub: `${r.ref || ''} · ${r.type || ''}`, type: 'crm', tab: 'crm' }); });
+  state.employees.forEach(e => { if (e.name?.toLowerCase().includes(q) || e.role?.toLowerCase().includes(q)) items.push({ icon: '👤', name: e.name, sub: `${e.role || ''} · ${e.division || ''}`, type: 'staff', tab: 'staff' }); });
+  state.tasks.forEach(t => { if (t.title?.toLowerCase().includes(q)) items.push({ icon: '✅', name: t.title, sub: `Due ${t.dueDate || ''}`, type: 'task', tab: 'calendar' }); });
+  state.assets.forEach(a => { if (a.name?.toLowerCase().includes(q) || a.serial?.toLowerCase().includes(q)) items.push({ icon: '🖥️', name: a.name, sub: `${a.serial || ''} · ${a.location || ''}`, type: 'asset', tab: 'assets' }); });
+  state.fleet.forEach(f => { if (f.reg?.toLowerCase().includes(q) || f.make?.toLowerCase().includes(q)) items.push({ icon: '🚗', name: f.reg, sub: `${f.make || ''} ${f.model || ''}`, type: 'fleet', tab: 'fleet' }); });
+  state.freelancers.forEach(f => { if (f.name?.toLowerCase().includes(q)) items.push({ icon: '🧑‍💻', name: f.name, sub: f.role || 'Freelancer', type: 'freelancer', tab: 'freelancers' }); });
+  if (items.length === 0) { results.innerHTML = '<div style="padding:20px;color:var(--text-faint);text-align:center;">No results found.</div>'; return; }
+  results.innerHTML = items.slice(0, 15).map(i =>
+    `<div class="sm-row" onclick="setTab('${i.tab}');document.getElementById('searchOverlay').classList.remove('open');"><span class="ico">${i.icon}</span><div class="main"><b>${esc(i.name)}</b><span>${esc(i.sub)}</span></div><span class="meta">${i.type}</span></div>`
+  ).join('');
+});
+
+// ─── FIREBASE INIT ─────────────────────────────────────────────────
+async function initFirebase() {
   try {
-    if(!firebase.apps.length){ firebase.initializeApp(FIREBASE_CONFIG); }
+    if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
     state.db = firebase.firestore();
     state.auth = firebase.auth();
     state.auth.onAuthStateChanged(async user => {
       state.user = user;
       state.isAdmin = user ? isAdminEmail(user.email) : false;
       updateSidebarAuth();
-      if(user) {
-        setModeUI(true);
-        state.firebaseReady = true;
-        await refreshAll();
-        if(state.tab) render();
-      } else {
-        if(state.db) {
-          setModeUI(true);
-          state.firebaseReady = true;
-          await refreshAll();
-          if(state.tab) render();
-        }
-      }
+      if (user) { setModeUI(true); state.firebaseReady = true; await refreshAll(); if (state.tab) render(); }
+      else { if (state.db) { setModeUI(true); state.firebaseReady = true; await refreshAll(); if (state.tab) render(); } }
     });
     await state.db.collection('mg_divisions').limit(1).get();
-    setModeUI(true);
-    state.firebaseReady = true;
-    return true;
-  } catch(e) {
+    setModeUI(true); state.firebaseReady = true; return true;
+  } catch (e) {
     console.warn('Firebase init failed', e);
-    state.firebaseReady = false;
-    setModeUI(false);
-    return false;
+    state.firebaseReady = false; setModeUI(false); return false;
   }
 }
-function setModeUI(live){
+function setModeUI(live) {
   document.getElementById('modeDot').classList.toggle('live', live);
-  document.getElementById('modeText').textContent = live ? (state.user ? `Live (${state.user.email})` : 'Live (read-only)') : 'Demo mode — local';
+  document.getElementById('modeText').textContent = live ? (state.user ? `Live (${state.user.email})` : 'Live (read-only)') : 'Offline — check connection';
 }
 
-/* =========================================================================
-   RENDER: NAV / ROUTER
-========================================================================= */
+// ─── NAV / RENDER ──────────────────────────────────────────────────
 const TAB_META = {
-  dashboard:{title:'Dashboard', sub:'Live group-wide view — stats from real systems.'},
-  hub:{title:'Division Hub', sub:'Launch straight into each division\'s own system.'},
-  crm:{title:'CRM', sub:'Enquiries, quotations, invoices, complaints and ratings.'},
-  staff:{title:'Staff / HR', sub:'Employee register – manage all team members.'},
-  freelancers:{title:'Freelancers & Activity', sub:'Track who logged what, when.'},
-  calendar:{title:'Unified Calendar', sub:'Tasks, CRM follow-ups, cleaning jobs, SLA deadlines.'},
-  settings:{title:'Settings', sub:'Authentication, export, and system info.'}
+  dashboard: { title: 'Command Center', sub: 'Good Morning, Moses.' },
+  hub: { title: 'Division Hub', sub: 'Launch into any business unit.' },
+  health: { title: 'Business Health Engine', sub: 'Live scores per division.' },
+  ops: { title: 'Operations Centre', sub: 'Live jobs, technicians, cleaners.' },
+  automation: { title: 'Workflow Automation', sub: 'Configure business workflows.' },
+  crm: { title: 'CRM · Customer 360', sub: 'Unified customer profiles.' },
+  approvals: { title: 'Approval Centre', sub: 'Pending leave, POs, invoices.' },
+  staff: { title: 'Staff / HR Portal', sub: 'Manage employees, payslips, leave.' },
+  freelancers: { title: 'Freelancers', sub: 'Track activity and performance.' },
+  fleet: { title: 'Fleet Management', sub: 'Vehicles, fuel, GPS, maintenance.' },
+  finance: { title: 'Finance Centre', sub: 'Revenue, expenses, profit, cashflow.' },
+  assets: { title: 'Asset Centre', sub: 'Group-wide inventory with QR.' },
+  procurement: { title: 'Procurement', sub: 'Suppliers, POs, invoices, deliveries.' },
+  ai: { title: 'MG AI Assistant', sub: 'Ask anything about your business.' },
+  reports: { title: 'Reports Centre', sub: 'Generate PDFs automatically.' },
+  security: { title: 'Security Centre', sub: 'Cyber I.T. Masters security score.' },
+  knowledge: { title: 'Knowledge Base', sub: 'SOPs, policies, runbooks.' },
+  audit: { title: 'Audit Trail', sub: 'Every action logged.' },
+  calendar: { title: 'Unified Calendar', sub: 'Tasks, follow-ups, cleaning, SLA.' },
+  settings: { title: 'Settings', sub: 'Authentication and system info.' }
 };
 
-function setTab(tab){
+function setTab(tab) {
   state.tab = tab;
-  document.querySelectorAll('.nav-item').forEach(n=> n.classList.toggle('active', n.dataset.tab===tab));
-  document.getElementById('pageTitle').textContent = TAB_META[tab].title;
-  document.getElementById('pageSub').textContent = TAB_META[tab].sub;
+  try { sessionStorage.setItem('mg_ui_tab', tab); } catch (e) {}
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.tab === tab));
+  document.getElementById('pageTitle').textContent = TAB_META[tab]?.title || 'Dashboard';
+  document.getElementById('pageSub').textContent = TAB_META[tab]?.sub || '';
   document.getElementById('sidebar').classList.remove('open');
   render();
 }
-document.querySelectorAll('.nav-item').forEach(n=> n.addEventListener('click', ()=> setTab(n.dataset.tab)));
-document.getElementById('menuToggle').addEventListener('click', ()=> document.getElementById('sidebar').classList.toggle('open'));
+document.querySelectorAll('.nav-item').forEach(n => n.addEventListener('click', () => setTab(n.dataset.tab)));
+document.getElementById('menuToggle').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
 
-function render(){
+function render() {
   const v = document.getElementById('view');
   const ta = document.getElementById('topActions');
-  ta.innerHTML = '';
-  if(state.tab==='dashboard') return renderDashboard(v, ta);
-  if(state.tab==='hub') return renderHub(v, ta);
-  if(state.tab==='crm') return renderCRM(v, ta);
-  if(state.tab==='staff') return renderStaff(v, ta);
-  if(state.tab==='freelancers') return renderFreelancers(v, ta);
-  if(state.tab==='calendar') return renderCalendar(v, ta);
-  if(state.tab==='settings') return renderSettings(v, ta);
+  ta.innerHTML = ''; ta.style.display = 'none';
+  switch (state.tab) {
+    case 'dashboard': return renderDashboard(v, ta);
+    case 'hub': return renderHub(v, ta);
+    case 'health': return renderHealth(v, ta);
+    case 'ops': return renderOps(v, ta);
+    case 'automation': return renderAutomation(v, ta);
+    case 'crm': return renderCRM(v, ta);
+    case 'approvals': return renderApprovals(v, ta);
+    case 'staff': return renderStaff(v, ta);
+    case 'freelancers': return renderFreelancers(v, ta);
+    case 'fleet': return renderFleet(v, ta);
+    case 'finance': return renderFinance(v, ta);
+    case 'assets': return renderAssets(v, ta);
+    case 'procurement': return renderProcurement(v, ta);
+    case 'ai': return renderAI(v, ta);
+    case 'reports': return renderReports(v, ta);
+    case 'security': return renderSecurity(v, ta);
+    case 'knowledge': return renderKnowledge(v, ta);
+    case 'audit': return renderAudit(v, ta);
+    case 'calendar': return renderCalendar(v, ta);
+    case 'settings': return renderSettings(v, ta);
+    default: renderDashboard(v, ta);
+  }
 }
 
-/* =========================================================================
-   DASHBOARD
-========================================================================= */
-function renderDashboard(v, ta){
-  ta.innerHTML = `<button class="btn ghost sm" id="refreshBtn">↻ Refresh</button>`;
-  document.getElementById('refreshBtn').onclick = async ()=>{ await refreshAll(); render(); toast('Refreshed'); };
-
+// ─── COMMAND CENTER DASHBOARD (real computed numbers) ─────────────
+function renderDashboard(v, ta) {
   const s = state.stats;
-  const citm = s.citm || { openTickets:0, critical:0, slaBreaches:0 };
-  const mgfc = s.mgfc || { jobsToday:0, sitesActive:0, staffDeployed:0, openIssues:0 };
+  const citm = s.citm || { openTickets: 0, critical: 0, slaBreaches: 0, revenue: 0, profit: 0 };
+  const mgfc = s.mgfc || { jobsToday: 0, sitesActive: 0, staffDeployed: 0, openIssues: 0, revenue: 0, profit: 0 };
+  const totalRevenue = s._totalRevenue || 0;
+  const totalProfit = citm.profit + mgfc.profit;
+  const totalStaff = state.employees.length;
+  const healthScore = state.health.citm?.score;
+  const healthKnown = healthScore !== null && healthScore !== undefined;
+
+  const statusMap = { healthy: '🟢 Healthy', busy: '🟡 Busy', coming: '⚪ Coming Soon', planning: '⚪ Planning' };
+
+  const priorities = [];
+  state.tickets.filter(t => (t.priority||'').toLowerCase() === 'critical' && !['resolved','closed'].includes((t.status||'').toLowerCase())).slice(0,3).forEach(t => priorities.push({ icon: '🔴', text: `${t.title || 'Critical ticket'} — <strong>${esc(t.ref||t.id)}</strong>`, tag: 'Critical' }));
+  state.crm.filter(r => r.type === 'quotation' && r.status === 'Sent').slice(0,2).forEach(r => priorities.push({ icon: '🟠', text: `Quote awaiting response — <strong>${esc(r.ref||r.client||'—')}</strong>`, tag: 'Follow up' }));
+  state.approvals.filter(a => a.status === 'Pending').slice(0,2).forEach(a => priorities.push({ icon: '🟣', text: `${esc(a.type)} pending — <strong>${esc(a.requester||'—')}</strong>`, tag: 'Approval' }));
+  state.crm.filter(r => r.type === 'quotation' && r.status === 'Accepted').slice(0,1).forEach(r => priorities.push({ icon: '🟢', text: `Quote accepted — <strong>${esc(r.client||r.ref||'—')}</strong>`, tag: 'Won' }));
 
   v.innerHTML = `
-    ${!state.firebaseReady ? `<div class="banner"><span>⚠</span><span><b>Demo mode.</b> Data is stored locally. Connect Firestore in <b>Settings</b> and sign in.</span></div>` : ''}
-    ${state.firebaseReady && !state.user ? `<div class="banner info"><span>🔑</span><span>Connected but <b>read-only</b>. Sign in with an admin email to create/edit records.</span></div>` : ''}
-    ${state.user && state.isAdmin ? `<div class="banner success"><span>⚡</span><span><b>Admin mode.</b> Full write access. Stats are computed live from your IT and Cleaning systems.</span></div>` : ''}
+    <div class="greeting-hero">
+      <div><div class="gh-label">${new Date().toLocaleDateString('en-ZA', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</div>
+        <h2>${new Date().getHours() < 12 ? 'Good Morning' : new Date().getHours() < 18 ? 'Good Afternoon' : 'Good Evening'}, Moses.</h2>
+        <div class="gh-sub">Business Health ${healthKnown ? `<strong style="color:${healthScore > 90 ? 'var(--green)' : healthScore > 75 ? 'var(--amber)' : 'var(--red)'}">${healthScore}%</strong>` : '<span style="color:var(--text-faint)">— not enough data yet</span>'} · ${state.employees.length} employees · ${state.crm.length} CRM records</div>
+      </div>
+      <div style="display:flex;gap:8px;"><span class="badge b-done">● Live</span><span class="badge b-neutral">v5.1</span></div>
+    </div>
 
     <div class="grid cols-4">
+      <div class="card kpi railed" style="--rail:var(--green)">
+        <div class="kpi-top">Paid Revenue (all time)</div>
+        <div class="kpi-num">R${totalRevenue.toLocaleString()}</div>
+        <div class="kpi-foot">${totalRevenue ? 'From paid CRM invoices' : 'No paid invoices logged yet'}</div>
+      </div>
       <div class="card kpi railed" style="--rail:var(--blue)">
-        <div class="kpi-top">IT Open Tickets</div>
-        <div class="kpi-num">${citm.openTickets}</div>
-        <div class="kpi-foot">${citm.critical} critical</div>
+        <div class="kpi-top">Est. Profit</div>
+        <div class="kpi-num">R${totalProfit.toLocaleString()}</div>
+        <div class="kpi-foot">${totalRevenue ? 'Modelled at division margin' : '—'}</div>
+      </div>
+      <div class="card kpi railed" style="--rail:var(--red)">
+        <div class="kpi-top">Open Support Tickets</div>
+        <div class="kpi-num">${s._hasTicketData ? citm.openTickets : '—'}</div>
+        <div class="kpi-foot ${citm.critical > 0 ? 'bad' : ''}">${s._hasTicketData ? citm.critical + ' critical' : 'No mg_tickets data yet'}</div>
       </div>
       <div class="card kpi railed" style="--rail:var(--amber)">
         <div class="kpi-top">Cleaning Jobs Today</div>
-        <div class="kpi-num">${mgfc.jobsToday}</div>
-        <div class="kpi-foot">${mgfc.staffDeployed} staff deployed</div>
+        <div class="kpi-num">${s._hasJobData ? mgfc.jobsToday : '—'}</div>
+        <div class="kpi-foot">${s._hasJobData ? mgfc.staffDeployed + ' staff deployed' : 'No mg_mgfc_jobs data yet'}</div>
       </div>
-      <div class="card kpi railed" style="--rail:var(--red)">
-        <div class="kpi-top">SLA Breaches (IT)</div>
-        <div class="kpi-num">${citm.slaBreaches}</div>
-        <div class="kpi-foot">${citm.slaBreaches ? '⚠️ Needs attention' : '✅ All on track'}</div>
+      <div class="card kpi railed" style="--rail:var(--violet)">
+        <div class="kpi-top">Outstanding Quotes</div>
+        <div class="kpi-num">${state.crm.filter(r => r.type === 'quotation' && (r.status === 'Draft' || r.status === 'Sent')).length}</div>
+        <div class="kpi-foot">Total R${state.crm.filter(r => r.type === 'quotation').reduce((a, c) => a + Number(c.amount || 0), 0).toLocaleString()}</div>
       </div>
       <div class="card kpi railed" style="--rail:var(--teal)">
-        <div class="kpi-top">Open CRM Records</div>
-        <div class="kpi-num">${state.crm.filter(r=> !['won','lost','closed','paid'].includes((r.status||'').toLowerCase())).length}</div>
-        <div class="kpi-foot">Total ${state.crm.length} entries</div>
+        <div class="kpi-top">Staff On Record</div>
+        <div class="kpi-num">${totalStaff}</div>
+        <div class="kpi-foot">${state.employees.filter(e => e.status === 'Active').length} active</div>
+      </div>
+      <div class="card kpi railed" style="--rail:var(--rose)">
+        <div class="kpi-top">Unread Alerts</div>
+        <div class="kpi-num" style="color:var(--red)">${state.notifications.filter(n => n.type === 'alert' && !n.read).length}</div>
+        <div class="kpi-foot ${state.notifications.filter(n => n.type==='alert'&&!n.read).length ? 'bad' : ''}">${state.notifications.filter(n => n.type==='alert'&&!n.read).length ? 'Requires attention' : 'All clear'}</div>
+      </div>
+      <div class="card kpi railed" style="--rail:var(--blue)">
+        <div class="kpi-top">Business Health Score</div>
+        <div class="kpi-num" style="color:${healthKnown ? (healthScore > 90 ? 'var(--green)' : healthScore > 75 ? 'var(--amber)' : 'var(--red)') : 'var(--text-faint)'}">${healthKnown ? healthScore + '%' : '—'}</div>
+        <div class="kpi-foot">${healthKnown ? '' : 'Log CRM/ticket data to compute'}</div>
       </div>
     </div>
 
-    <div class="section-title"><h2>Division overview (live from systems)</h2></div>
-    <div class="grid cols-4" id="divisionOverviewCards">
-      ${state.divisions.map(d => {
-        const s = state.stats[d.id] || {};
-        return `
-          <div class="card dh-card railed" style="--rail:${d.color}">
-            <div class="dh-head">
-              <div class="dh-icon" style="background:${d.color}">${esc(d.short)}</div>
-              <div><div class="dh-name">${esc(d.name)}</div><div class="dh-desc" style="margin-top:1px">${d.kind==='msp' ? 'IT Support' : d.kind==='cleaning' ? 'Cleaning Ops' : 'Business'}</div></div>
-            </div>
-            <div class="dh-stats">
-              ${d.kind==='msp' ? `
-                <div class="dh-stat"><b>${s.openTickets ?? 0}</b><span>Open tickets</span></div>
-                <div class="dh-stat"><b style="${s.critical ? 'color:var(--red)' : ''}">${s.critical ?? 0}</b><span>Critical</span></div>
-                <div class="dh-stat"><b>${s.slaBreaches ?? 0}</b><span>SLA breaches</span></div>
-              ` : d.kind==='cleaning' ? `
-                <div class="dh-stat"><b>${s.jobsToday ?? 0}</b><span>Jobs today</span></div>
-                <div class="dh-stat"><b>${s.sitesActive ?? 0}</b><span>Active sites</span></div>
-                <div class="dh-stat"><b>${s.staffDeployed ?? 0}</b><span>Staff deployed</span></div>
-              ` : `
-                <div class="dh-stat"><b>${s.metric1 ?? 0}</b><span>${s.metric1Label || 'Metric 1'}</span></div>
-                <div class="dh-stat"><b>${s.metric2 ?? 0}</b><span>${s.metric2Label || 'Metric 2'}</span></div>
-              `}
-            </div>
-            <div class="dh-actions">
-              ${d.url ? `<a class="btn sm" href="${esc(d.url)}" target="_blank" rel="noopener">Open ↗</a>` : ''}
-            </div>
-          </div>
-        `;
-      }).join('')}
+    <div class="section-title"><h2>📋 Today's Priorities</h2></div>
+    <div class="card" style="padding:6px 0;">
+      ${priorities.length ? priorities.map(p => `<div class="priority-item"><span class="pi-icon">${p.icon}</span><span class="pi-text">${p.text}</span><span class="pi-tag">${p.tag}</span></div>`).join('') : '<div class="table-empty">Nothing urgent right now. 🎉</div>'}
     </div>
 
-    <div class="section-title"><h2>Recent CRM Activity</h2><span class="hint" style="cursor:pointer" onclick="setTab('crm')">open full CRM →</span></div>
-    <div class="table-wrap"><div class="table-scroll">
-    <table>
-      <thead><tr><th>Type</th><th>Client</th><th>Division</th><th>Status</th><th>Updated</th></tr></thead>
-      <tbody>
-        ${state.crm.slice(0,6).map(r=>`
-          <tr>
-            <td>${crmTypeMeta(r.type).label}</td>
-            <td><div class="cell-main">${esc(r.client||'—')}</div></td>
-            <td><span class="dtag" style="--dc:${divisionById(r.division).color}"><span class="dot"></span>${esc(divisionById(r.division).short)}</span></td>
-            <td><span class="badge ${statusBadgeClass(r.status)}">${esc(r.status||'—')}</span></td>
-            <td>${fmtDate(r._createdAt)}</td>
-          </tr>`).join('') || `<tr><td colspan="5" class="table-empty">No CRM records yet.</td></tr>`}
-      </tbody>
-    </table>
-    </div></div>
+    <div class="section-title"><h2>🏢 Company Status Map</h2></div>
+    <div class="card" style="padding:12px 16px;">
+      <div class="map-strip">
+        ${state.divisions.map(d => `
+          <div class="map-tile">
+            <div class="mt-top">
+              <span class="mt-name">${d.name}</span>
+              <span class="map-status"><span class="dot" style="--sc:${d.status === 'healthy' ? 'var(--green)' : d.status === 'busy' ? 'var(--amber)' : 'var(--text-faint)'}"></span> ${statusMap[d.status] || d.status}</span>
+            </div>
+            <div class="mt-sub">${d.desc || ''}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="section-title"><h2>📊 Recent Activity (from Audit Trail)</h2></div>
+    <div class="table-wrap">
+      <div class="table-scroll">
+        <table><thead><tr><th>Event</th><th>Target</th><th>User</th><th>Time</th></tr></thead>
+          <tbody>
+            ${state.audit.slice(0,6).map(a => `<tr><td>${esc(a.action)}</td><td>${esc(a.target)}</td><td>${esc(a.user)}</td><td style="font-size:11px;color:var(--text-faint);">${new Date(a.timestamp).toLocaleString('en-ZA')}</td></tr>`).join('') || '<tr><td colspan="4" class="table-empty">No activity logged yet — actions you take (CRM edits, approvals, staff changes) will appear here.</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    </div>
   `;
 }
 
-/* =========================================================================
-   DIVISION HUB
-========================================================================= */
-function renderHub(v, ta){
-  ta.innerHTML = state.user && state.isAdmin ? `<button class="btn primary sm" id="addDivBtn">+ Add division / link</button>` : '';
-  if(document.getElementById('addDivBtn')) document.getElementById('addDivBtn').onclick = ()=> openDivisionModal();
+// ─── DIVISION HUB ──────────────────────────────────────────────────
+function renderHub(v, ta) {
+  ta.style.display = 'flex';
+  ta.innerHTML = state.user && state.isAdmin ? `<button class="btn primary sm" onclick="openDivisionModal()">+ Add division</button>` : '';
   v.innerHTML = `<div class="grid cols-3" id="hubCards"></div>`;
   const cards = document.getElementById('hubCards');
-  state.divisions.forEach(d=>{
+  state.divisions.forEach(d => {
     cards.appendChild(el(`
       <div class="card dh-card railed" style="--rail:${d.color}">
         <div class="dh-head">
           <div class="dh-icon" style="background:${d.color}">${esc(d.short)}</div>
           <div style="flex:1"><div class="dh-name">${esc(d.name)}</div></div>
-          ${state.user && state.isAdmin ? `<div class="row-actions"><button class="icon-btn" data-edit-div="${d.id}" title="Edit">✎</button></div>` : ''}
         </div>
-        <div class="dh-desc">${d.desc||''}</div>
-        <div class="dh-url">${d.url ? esc(d.url) : 'No URL set'}</div>
+        <div class="dh-desc">${d.desc || ''}</div>
         <div class="dh-actions">
-          ${d.url ? `<a class="btn primary sm" href="${esc(d.url)}" target="_blank" rel="noopener">Open system ↗</a>` : (state.user && state.isAdmin ? `<button class="btn sm" data-edit-div="${d.id}">Add URL</button>` : '')}
+          ${d.url ? `<a class="btn primary sm" href="${esc(d.url)}" target="_blank">Open system ↗</a>` : '<span style="font-size:10px;color:var(--text-faint);">No URL configured</span>'}
         </div>
       </div>
     `));
   });
-  cards.querySelectorAll('[data-edit-div]').forEach(b=> b.onclick = ()=> openDivisionModal(b.dataset.editDiv));
 }
-function openDivisionModal(divId){
-  if(!state.user){ toast('Sign in to edit'); return; }
-  const editing = !!divId;
-  const d = editing ? divisionById(divId) : {id:'', name:'', short:'', desc:'', url:'', color:'#2dd4bf', kind:'other'};
-  openModal(`
-    <h3>${editing?'Edit division':'Add division'}</h3>
-    <div class="field"><label>Name</label><input id="f_name" value="${esc(d.name)}"></div>
-    <div class="field-row">
-      <div class="field"><label>Short code</label><input id="f_short" maxlength="4" value="${esc(d.short)}"></div>
-      <div class="field"><label>Colour</label><input id="f_color" type="color" value="${d.color}" style="padding:3px;height:38px;"></div>
-    </div>
-    <div class="field"><label>System URL</label><input id="f_url" value="${esc(d.url)}" placeholder="https://…"></div>
-    <div class="field"><label>Description</label><textarea id="f_desc">${esc(d.desc)}</textarea></div>
-    <div class="field"><label>Kind</label>
-      <select id="f_kind">
-        <option value="msp" ${d.kind==='msp'?'selected':''}>MSP / ticketing</option>
-        <option value="cleaning" ${d.kind==='cleaning'?'selected':''}>Cleaning</option>
-        <option value="retail" ${d.kind==='retail'?'selected':''}>Retail</option>
-        <option value="sales" ${d.kind==='sales'?'selected':''}>Sales</option>
-        <option value="other" ${d.kind==='other'?'selected':''}>Other</option>
-      </select>
-    </div>
-    <div class="modal-actions">
-      ${editing? `<button class="btn danger ghost" id="delDivBtn" style="margin-right:auto">Remove</button>`:''}
-      <button class="btn ghost" onclick="closeModal()">Cancel</button>
-      <button class="btn primary" id="saveDivBtn">${editing?'Save':'Add'}</button>
-    </div>
-  `);
-  if(editing) document.getElementById('delDivBtn').onclick = async ()=>{
-    if(!confirm('Remove this division?')) return;
-    await Store.remove('mg_divisions', divId); await refreshAll(); closeModal(); render(); toast('Removed');
-  };
-  document.getElementById('saveDivBtn').onclick = async ()=>{
-    const name = document.getElementById('f_name').value.trim();
-    if(!name){ toast('Name required'); return; }
-    const data = {
-      name,
-      short: document.getElementById('f_short').value.trim()||name.slice(0,3).toUpperCase(),
-      color: document.getElementById('f_color').value,
-      url: document.getElementById('f_url').value.trim(),
-      desc: document.getElementById('f_desc').value.trim(),
-      kind: document.getElementById('f_kind').value
-    };
-    const id = editing ? divId : (name.toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,20) + '-' + uid().slice(0,4));
-    await Store.set('mg_divisions', id, data); await refreshAll(); closeModal(); render(); toast(editing?'Updated':'Added');
-  };
-}
+function openDivisionModal() { toast('Division management — v1.2 roadmap item'); }
 
-/* =========================================================================
-   CRM (simplified, using atomic getNextRef)
-========================================================================= */
-function renderCRM(v, ta){
-  ta.innerHTML = state.user ? `<button class="btn primary sm" id="addCrmBtn">+ New record</button>` : `<span style="color:var(--text-faint);font-size:12px;">Sign in to add records</span>`;
-  if(document.getElementById('addCrmBtn')) document.getElementById('addCrmBtn').onclick = ()=> openCrmModal();
-  const rows = state.crm.slice().sort((a,b)=>(b._createdAt||0)-(a._createdAt||0)).filter(r => state.crmFilter==='all' || r.type===state.crmFilter).filter(r => state.crmStatusFilter==='all' || (r.status||'')===state.crmStatusFilter);
+// ─── BUSINESS HEALTH ───────────────────────────────────────────────
+function renderHealth(v, ta) {
+  const entries = Object.entries(state.health);
   v.innerHTML = `
-    <div class="tabs" id="crmTypeTabs">
-      <button class="tab-btn ${state.crmFilter==='all'?'active':''}" data-type="all">All (${state.crm.length})</button>
-      ${CRM_TYPES.map(t=>`<button class="tab-btn ${state.crmFilter===t.id?'active':''}" data-type="${t.id}">${t.label} (${state.crm.filter(r=>r.type===t.id).length})</button>`).join('')}
-    </div>
-    <div class="table-wrap">
-      <div class="table-toolbar">
-        <select id="crmDivFilter"><option value="all">All divisions</option>${state.divisions.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join('')}</select>
-        <select id="crmStatFilter"><option value="all">All statuses</option>${[...new Set(state.crm.map(r=>r.status).filter(Boolean))].map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join('')}</select>
-        <span style="margin-left:auto;color:var(--text-faint);font-family:var(--font-mono);font-size:11px">${rows.length} records</span>
-      </div>
-      <div class="table-scroll"><table><thead><tr><th>Type</th><th>Client</th><th>Division</th><th>Ref</th><th>Status</th><th>Detail</th><th>Date</th><th></th></tr></thead>
-      <tbody id="crmRows">${rows.length? rows.map(rowHtmlCrm).join('') : `<tr><td colspan="8" class="table-empty">No records match.</td></tr>`}</tbody></table></div>
+    <div class="section-title"><h2>🏥 Business Health Engine</h2><span class="hint">Computed live from CRM, ticket &amp; job data</span></div>
+    <div class="grid cols-2" id="healthGrid">
+      ${entries.sort((a, b) => (a[1].score ?? 999) - (b[1].score ?? 999)).map(([id, h]) => {
+        const d = divisionById(id);
+        const s = h.score;
+        const m = h.metrics || {};
+        return `
+          <div class="card railed" style="--rail:${d.color}">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div class="dh-icon" style="background:${d.color};width:32px;height:32px;font-size:12px;">${d.short}</div>
+                <div><div style="font-weight:700;">${d.name}</div><div style="font-size:10.5px;color:var(--text-faint);">${d.kind}</div></div>
+              </div>
+              ${s !== null ? `<div class="ring" style="--rc:${s > 90 ? 'var(--green)' : s > 75 ? 'var(--amber)' : 'var(--red)'};--pct:${s}"><b>${s}</b></div>` : `<div class="ring" style="--rc:var(--text-faint);--pct:0"><b>—</b></div>`}
+            </div>
+            <div>
+              ${Object.entries(m).filter(([,val]) => val !== null && val !== undefined).map(([k, val]) => `
+                <div class="health-row">
+                  <span class="lbl">${k.charAt(0).toUpperCase() + k.slice(1)}</span>
+                  <div class="health-track"><div class="health-fill" style="--hc:${val > 85 ? 'var(--green)' : val > 70 ? 'var(--amber)' : 'var(--red)'};width:${Math.min(100, val)}%"></div></div>
+                  <span class="val">${Math.round(val)}%</span>
+                </div>
+              `).join('') || '<div style="font-size:11px;color:var(--text-faint);">No CRM data logged for this division yet.</div>'}
+            </div>
+          </div>
+        `;
+      }).join('')}
     </div>
   `;
-  document.querySelectorAll('#crmTypeTabs .tab-btn').forEach(b=> b.onclick = ()=>{ state.crmFilter=b.dataset.type; render(); });
-  document.getElementById('crmDivFilter').onchange = (e)=>{ const val=e.target.value; let r2=state.crm.slice(); if(state.crmFilter!=='all') r2=r2.filter(r=>r.type===state.crmFilter); if(val!=='all') r2=r2.filter(r=>r.division===val); document.getElementById('crmRows').innerHTML = r2.length? r2.map(rowHtmlCrm).join('') : `<tr><td colspan="8" class="table-empty">No records.</td></tr>`; bindCrmRowEvents(); };
-  document.getElementById('crmStatFilter').onchange = (e)=>{ state.crmStatusFilter=e.target.value; render(); };
-  bindCrmRowEvents();
-}
-function rowHtmlCrm(r){
-  const d = divisionById(r.division);
-  let detail = '';
-  if(r.type==='quotation'||r.type==='invoice') detail = r.amount ? `R ${Number(r.amount).toLocaleString()}` : '—';
-  else if(r.type==='complaint') detail = `<span class="${sevClass(r.severity)}">${esc(r.severity||'—')}</span>`;
-  else if(r.type==='rating') detail = `<span class="stars">${'★'.repeat(Number(r.rating||0))}${'☆'.repeat(5-Number(r.rating||0))}</span>`;
-  else detail = esc(r.description ? (r.description.slice(0,40)+(r.description.length>40?'…':'')) : '—');
-  const isOwner = state.user && r._owner === state.user.uid;
-  const canEdit = state.user && (isOwner || state.isAdmin);
-  return `<tr data-id="${r.id}">
-    <td>${crmTypeMeta(r.type).label}</td>
-    <td><div class="cell-main">${esc(r.client||'—')}</div><div class="cell-sub">${esc(r.contact||'')}</div></td>
-    <td><span class="dtag" style="--dc:${d.color}"><span class="dot"></span>${esc(d.short)}</span></td>
-    <td style="font-family:var(--font-mono);font-size:11.5px;color:var(--text-dim)">${esc(r.ref||'—')}</td>
-    <td><span class="badge ${statusBadgeClass(r.status)}">${esc(r.status||'—')}</span></td>
-    <td style="max-width:220px">${detail}</td>
-    <td style="white-space:nowrap;color:var(--text-faint);font-size:12px">${fmtDate(r._createdAt)}</td>
-    <td>${canEdit ? `<div class="row-actions"><button class="icon-btn" data-crm-edit="${r.id}" title="Edit">✎</button>${state.isAdmin? `<button class="icon-btn" data-crm-del="${r.id}" title="Delete">🗑</button>`:''}</div>` : `<span style="font-size:10px;color:var(--text-faint);">🔒</span>`}</td>
-  </tr>`;
-}
-function bindCrmRowEvents(){
-  document.querySelectorAll('[data-crm-edit]').forEach(b=> b.onclick = ()=> openCrmModal(b.dataset.crmEdit));
-  document.querySelectorAll('[data-crm-del]').forEach(b=> b.onclick = async ()=>{ if(!confirm('Delete?')) return; await Store.remove('mg_crm', b.dataset.crmDel); await refreshAll(); render(); toast('Deleted'); });
-}
-function openCrmModal(recId){
-  if(!state.user){ toast('Sign in to create records'); return; }
-  const editing=!!recId; const r=editing?state.crm.find(x=>x.id===recId):{type:'enquiry',division:state.divisions[0]?.id,status:'New',client:'',contact:'',description:'',amount:'',severity:'Medium',rating:'5',ref:''};
-  openModal(`<h3>${editing?'Edit':'New'} record</h3><div class="modal-sub">All records stored in mg_crm with your UID as _owner.</div>
-    <div class="field-row"><div class="field"><label>Type</label><select id="f_type">${CRM_TYPES.map(t=>`<option value="${t.id}" ${r.type===t.id?'selected':''}>${t.label}</option>`).join('')}</select></div>
-    <div class="field"><label>Division</label><select id="f_division">${state.divisions.map(d=>`<option value="${d.id}" ${r.division===d.id?'selected':''}>${esc(d.name)}</option>`).join('')}</select></div></div>
-    <div class="field-row"><div class="field"><label>Client</label><input id="f_client" value="${esc(r.client)}"></div><div class="field"><label>Contact</label><input id="f_contact" value="${esc(r.contact)}"></div></div>
-    <div class="field"><label>Description</label><textarea id="f_description">${esc(r.description)}</textarea></div>
-    <div class="field-row"><div class="field"><label>Status</label><select id="f_status"></select></div><div class="field" id="amountField"><label>Amount (R)</label><input id="f_amount" type="number" value="${r.amount||''}"></div></div>
-    <div class="field-row"><div class="field" id="severityField"><label>Severity</label><select id="f_severity">${SEVERITIES.map(s=>`<option ${r.severity===s?'selected':''}>${s}</option>`).join('')}</select></div>
-    <div class="field" id="ratingField"><label>Rating</label><select id="f_rating">${[5,4,3,2,1].map(n=>`<option value="${n}" ${String(r.rating)===String(n)?'selected':''}>${n}</option>`).join('')}</select></div></div>
-    <div class="field"><label>Reference</label><input id="f_ref" value="${esc(r.ref)}"></div>
-    <div class="modal-actions">${editing?`<button class="btn danger ghost" id="delCrmBtn" style="margin-right:auto">Delete</button>`:''}<button class="btn ghost" onclick="closeModal()">Cancel</button><button class="btn primary" id="saveCrmBtn">${editing?'Save':'Create'}</button></div>`);
-  const refreshStatus=()=>{ const type=document.getElementById('f_type').value; const meta=crmTypeMeta(type); document.getElementById('f_status').innerHTML=meta.statuses.map(s=>`<option ${r.status===s?'selected':''}>${s}</option>`).join(''); document.getElementById('amountField').style.display=(type==='quotation'||type==='invoice')?'':'none'; document.getElementById('severityField').style.display=type==='complaint'?'':'none'; document.getElementById('ratingField').style.display=type==='rating'?'':'none'; };
-  document.getElementById('f_type').onchange=refreshStatus; refreshStatus();
-  if(editing) document.getElementById('delCrmBtn').onclick = async ()=>{ if(!confirm('Delete?')) return; await Store.remove('mg_crm', recId); await refreshAll(); closeModal(); render(); toast('Deleted'); };
-  document.getElementById('saveCrmBtn').onclick = async ()=>{
-    const type=document.getElementById('f_type').value;
-    const division=document.getElementById('f_division').value;
-    const client=document.getElementById('f_client').value.trim();
-    if(!client){ toast('Client required'); return; }
-    // Generate ref atomically via transaction
-    let ref = document.getElementById('f_ref').value.trim();
-    if(!ref) ref = await getNextRef(division, type);
-    const data={
-      type, division, client,
-      contact: document.getElementById('f_contact').value.trim(),
-      description: document.getElementById('f_description').value.trim(),
-      status: document.getElementById('f_status').value,
-      amount: document.getElementById('f_amount').value || null,
-      severity: document.getElementById('f_severity').value,
-      rating: document.getElementById('f_rating').value,
-      ref,
-      _updatedAt: Date.now()
-    };
-    if(editing){ await Store.update('mg_crm', recId, data); } else { await Store.add('mg_crm', data); }
-    await refreshAll(); closeModal(); render(); toast(editing?'Updated':'Created');
-  };
 }
 
-/* =========================================================================
-   STAFF / HR (unchanged, works)
-========================================================================= */
-function renderStaff(v, ta){
-  ta.innerHTML = state.user && state.isAdmin ? `<button class="btn primary sm" id="addStaffBtn">+ Add Employee</button>` : '';
-  if(document.getElementById('addStaffBtn')) document.getElementById('addStaffBtn').onclick = ()=> openStaffModal();
-
+// ─── OPERATIONS CENTRE ─────────────────────────────────────────────
+function renderOps(v, ta) {
+  const activeToday = state.mgfcJobs.filter(j => j.date === todayISO());
   v.innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-      <span style="font-size:13px;color:var(--text3);">${state.employees.length} employees</span>
-      <div class="searchbar" style="width:260px;"><input id="staffSearch" placeholder="Search by name, role, division…"/></div>
+    <div class="section-title"><h2>📡 Live Operations Centre</h2><span class="hint">Reads mg_tickets + mg_mgfc_jobs</span></div>
+    <div class="grid cols-2">
+      <div class="card"><h3 style="font-size:13px;font-weight:700;margin-bottom:8px;">🔧 Open Tickets</h3>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          ${state.tickets.filter(t => !['resolved','closed'].includes((t.status||'').toLowerCase())).slice(0,8).map(t => `
+            <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border-soft);"><span>${esc(t.assignedTo || 'Unassigned')}</span><span style="color:${(t.priority||'').toLowerCase()==='critical'?'var(--red)':'var(--amber)'};">● ${esc(t.status||'Open')}</span><span style="color:var(--text-faint);font-size:10px;">${esc(t.ref||t.id)}</span></div>
+          `).join('') || '<div class="empty-state">No open tickets in mg_tickets.</div>'}
+        </div>
+      </div>
+      <div class="card"><h3 style="font-size:13px;font-weight:700;margin-bottom:8px;">🧹 Today's Cleaning Jobs</h3>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          ${activeToday.slice(0,8).map(j => `
+            <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border-soft);"><span>${esc(j.site || 'Site')}</span><span style="color:${(j.status||'').toLowerCase()==='issue'?'var(--red)':'var(--green)'};">● ${esc(j.status||'Scheduled')}</span><span style="color:var(--text-faint);font-size:10px;">${esc((j.staff||[]).join(', '))}</span></div>
+          `).join('') || '<div class="empty-state">No jobs logged for today in mg_mgfc_jobs.</div>'}
+        </div>
+      </div>
     </div>
+    <div class="card" style="margin-top:12px;"><h3 style="font-size:13px;font-weight:700;margin-bottom:8px;">📊 Today's Jobs Map</h3><div style="height:120px;background:var(--elevated);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--text-faint);font-size:12px;">📍 Map integration not wired up (Leaflet / Google Maps) — v1.2 roadmap item</div></div>
+  `;
+}
+
+// ─── AUTOMATION ────────────────────────────────────────────────────
+function renderAutomation(v, ta) {
+  v.innerHTML = `
+    <div class="section-title"><h2>⚡ Workflow Automation</h2><span class="hint">Visual reference — not yet executing</span></div>
+    <div class="card" style="margin-bottom:12px; border-left:3px solid var(--amber);">
+      <div style="font-size:11.5px;color:var(--amber);">⚠ This screen illustrates the intended workflow chain. No trigger below actually fires yet — wiring it up means adding Cloud Functions (Firestore triggers) that watch <code>mg_crm</code> status changes and cascade the follow-on writes.</div>
+    </div>
+    <div class="card" style="margin-bottom:12px;"><h3 style="font-size:13px;font-weight:700;margin-bottom:8px;">📋 Quote Accepted → Automation Chain (planned)</h3>
+      <div class="flow-chain" style="display:flex;align-items:stretch;gap:0;flex-wrap:wrap;">
+        ${['📝 Quote Accepted','📁 Create Project','🔧 Allocate Tech','📦 Reserve Stock','💰 Generate Invoice','📅 Schedule','📧 Notify'].map((s, i) => `
+          <div style="background:var(--panel-2);border:1px solid var(--border-soft);border-radius:10px;padding:10px 14px;flex:1;min-width:110px;display:flex;flex-direction:column;gap:4px;">
+            <div style="font-size:16px;">${s.split(' ')[0]}</div>
+            <div style="font-weight:600;font-size:11px;">${s}</div>
+            <div style="color:var(--text-faint);font-size:9px;">${i === 0 ? 'Trigger' : 'Action ' + i}</div>
+          </div>
+          ${i < 6 ? `<div style="display:flex;align-items:center;padding:0 4px;color:var(--text-faint);font-size:14px;">→</div>` : ''}
+        `).join('')}
+      </div>
+    </div>
+    <div class="card"><h3 style="font-size:13px;font-weight:700;margin-bottom:8px;">🔁 Planned Workflows</h3>
+      ${[
+        { name: 'Quote → Project', trigger: 'quote_accepted' },
+        { name: 'Ticket → Engineer', trigger: 'ticket_created' },
+        { name: 'Invoice → Finance', trigger: 'invoice_generated' },
+        { name: 'Lead → CRM', trigger: 'new_lead' }
+      ].map(w => `
+        <div class="autorule-row"><span style="font-weight:600;font-size:12px;">${w.name}</span><span style="color:var(--text-faint);font-size:10px;flex:1;">${w.trigger}</span><span class="badge b-neutral">Not wired</span></div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// ─── CRM (REAL — full add/edit modal writing to mg_crm) ───────────
+function renderCRM(v, ta) {
+  ta.style.display = 'flex';
+  ta.innerHTML = state.user ? `<button class="btn primary sm" onclick="openCrmModal()">+ New Record</button>` : `<span style="font-size:11px;color:var(--text-faint);">Sign in to create records</span>`;
+  const rows = state.crm.slice().sort((a, b) => (b._createdAt || 0) - (a._createdAt || 0));
+  v.innerHTML = `
+    <div class="section-title"><h2>👤 CRM · Customer 360</h2><span class="hint">${rows.length} records</span></div>
     <div class="table-wrap">
       <div class="table-scroll">
-        <table>
-          <thead><tr><th>Name</th><th>Role</th><th>Division</th><th>Phone</th><th>Email</th><th>Status</th><th></th></tr></thead>
-          <tbody id="staffRows"></tbody>
+        <table><thead><tr><th>Type</th><th>Client</th><th>Division</th><th>Ref</th><th>Status</th><th>Amount</th><th>Date</th><th></th></tr></thead>
+          <tbody>
+            ${rows.length ? rows.map(r => `
+              <tr>
+                <td>${crmTypeMeta(r.type).label}</td>
+                <td class="cell-main">${esc(r.client || '—')}</td>
+                <td><span class="dtag" style="--dc:${divisionById(r.division).color}"><span class="dot"></span>${esc(divisionById(r.division).short)}</span></td>
+                <td style="font-family:var(--font-mono);font-size:11px;color:var(--text-dim);">${esc(r.ref || '—')}</td>
+                <td><span class="badge ${statusBadgeClass(r.status)}">${esc(r.status || '—')}</span></td>
+                <td>${r.amount ? 'R ' + Number(r.amount).toLocaleString() : '—'}</td>
+                <td style="font-size:11px;color:var(--text-faint);">${fmtDate(r._createdAt)}</td>
+                <td><button class="icon-btn" onclick="openCrmModal('${r.id}')">✎</button></td>
+              </tr>
+            `).join('') : '<tr><td colspan="8" class="table-empty">No CRM records yet. Click "+ New Record" to log an enquiry, quote, invoice or complaint.</td></tr>'}
+          </tbody>
         </table>
       </div>
     </div>
   `;
-  renderStaffRows();
+}
+function statusBadgeClass(s) {
+  const st = (s || '').toLowerCase();
+  if (['won','paid','resolved','closed','accepted','done'].includes(st)) return 'b-done';
+  if (['lost','overdue','rejected','expired'].includes(st)) return 'b-lost';
+  if (['new','draft','logged'].includes(st)) return 'b-new';
+  return 'b-progress';
+}
 
-  document.getElementById('staffSearch').oninput = () => renderStaffRows();
-}
-function renderStaffRows(){
-  const search = (document.getElementById('staffSearch')?.value || '').toLowerCase();
-  const rows = state.employees.filter(e =>
-    e.name?.toLowerCase().includes(search) ||
-    e.role?.toLowerCase().includes(search) ||
-    e.division?.toLowerCase().includes(search)
-  );
-  const tbody = document.getElementById('staffRows');
-  if(!tbody) return;
-  if(rows.length === 0){
-    tbody.innerHTML = `<tr><td colspan="7" class="table-empty">No employees found.</td></tr>`;
-    return;
-  }
-  tbody.innerHTML = rows.map(e => {
-    const div = divisionById(e.division);
-    return `
-      <tr>
-        <td class="cell-main">${esc(e.name)}</td>
-        <td>${esc(e.role||'—')}</td>
-        <td><span class="dtag" style="--dc:${div.color}"><span class="dot"></span>${esc(div.short)}</span></td>
-        <td>${esc(e.phone||'—')}</td>
-        <td>${esc(e.email||'—')}</td>
-        <td><span class="badge ${e.status==='Active'?'b-done':e.status==='Probation'?'b-progress':e.status==='On Leave'?'b-new':'b-lost'}">${esc(e.status||'Active')}</span></td>
-        <td><div class="row-actions">
-          <button class="icon-btn" data-staff-edit="${e.id}" title="Edit">✎</button>
-          ${state.isAdmin ? `<button class="icon-btn" data-staff-del="${e.id}" title="Delete">🗑</button>` : ''}
-        </div></td>
-      </tr>
-    `;
-  }).join('');
-  document.querySelectorAll('[data-staff-edit]').forEach(b => b.onclick = ()=> openStaffModal(b.dataset.staffEdit));
-  document.querySelectorAll('[data-staff-del]').forEach(b => b.onclick = async ()=>{
-    if(!confirm('Delete this employee?')) return;
-    await Store.remove('mg_employees', b.dataset.staffDel);
-    await refreshAll(); render(); toast('Employee removed');
-  });
-}
-function openStaffModal(id){
-  if(!state.user){ toast('Sign in'); return; }
+function openCrmModal(id) {
+  if (!state.user) { toast('Sign in to create or edit CRM records'); return; }
   const editing = !!id;
-  const e = editing ? state.employees.find(x=>x.id===id) : { name:'', role:'', division:state.divisions[0]?.id, phone:'', email:'', status:'Active', startDate:'', salary:'' };
+  const r = editing ? state.crm.find(x => x.id === id) : { type: 'enquiry', client: '', division: state.divisions[0]?.id || 'citm', ref: '', status: 'New', amount: '', notes: '', email: '', phone: '' };
+  if (editing && !r) { toast('Record not found'); return; }
+  const typeMeta = crmTypeMeta(r.type);
   openModal(`
-    <h3>${editing?'Edit Employee':'Add Employee'}</h3>
+    <h3>${editing ? 'Edit CRM Record' : 'New CRM Record'}</h3>
+    <div class="modal-sub">${editing ? esc(r.ref || r.id) : 'Log an enquiry, quotation, invoice, complaint, or service rating.'}</div>
     <div class="field-row">
-      <div class="field"><label>Full Name *</label><input id="f_name" value="${esc(e.name)}"></div>
-      <div class="field"><label>Role</label><input id="f_role" value="${esc(e.role)}" placeholder="e.g. Technician"></div>
+      <div class="field"><label>Record type</label>
+        <select id="c_type">${CRM_TYPES.map(t => `<option value="${t.id}" ${r.type === t.id ? 'selected' : ''}>${t.label}</option>`).join('')}</select>
+      </div>
+      <div class="field"><label>Division</label>
+        <select id="c_division">${state.divisions.map(d => `<option value="${d.id}" ${r.division === d.id ? 'selected' : ''}>${d.name}</option>`).join('')}</select>
+      </div>
+    </div>
+    <div class="field"><label>Client / Company name</label><input id="c_client" value="${esc(r.client)}" placeholder="e.g. Engen Depot"></div>
+    <div class="field-row">
+      <div class="field"><label>Email</label><input id="c_email" value="${esc(r.email)}" placeholder="contact@client.co.za"></div>
+      <div class="field"><label>Phone</label><input id="c_phone" value="${esc(r.phone)}" placeholder="+27 ..."></div>
     </div>
     <div class="field-row">
-      <div class="field"><label>Division</label><select id="f_division">${state.divisions.map(d=>`<option value="${d.id}" ${e.division===d.id?'selected':''}>${esc(d.name)}</option>`).join('')}</select></div>
-      <div class="field"><label>Status</label><select id="f_status">
-        <option ${e.status==='Active'?'selected':''}>Active</option>
-        <option ${e.status==='Probation'?'selected':''}>Probation</option>
-        <option ${e.status==='On Leave'?'selected':''}>On Leave</option>
-        <option ${e.status==='Terminated'?'selected':''}>Terminated</option>
-      </select></div>
+      <div class="field"><label>Reference</label><input id="c_ref" value="${esc(r.ref)}" placeholder="e.g. CITM-Q-2026-016"></div>
+      <div class="field"><label>Amount (R)</label><input id="c_amount" type="number" value="${esc(r.amount)}" placeholder="0.00"></div>
     </div>
-    <div class="field-row">
-      <div class="field"><label>Phone</label><input id="f_phone" value="${esc(e.phone)}"></div>
-      <div class="field"><label>Email</label><input id="f_email" value="${esc(e.email)}" type="email"></div>
+    <div class="field"><label>Status</label>
+      <select id="c_status">${typeMeta.statuses.map(st => `<option value="${st}" ${r.status === st ? 'selected' : ''}>${st}</option>`).join('')}</select>
     </div>
-    <div class="field-row">
-      <div class="field"><label>Start Date</label><input id="f_startDate" type="date" value="${e.startDate||''}"></div>
-      <div class="field"><label>Salary (R)</label><input id="f_salary" type="number" value="${e.salary||''}" placeholder="Monthly"></div>
-    </div>
+    <div class="field"><label>Notes</label><textarea id="c_notes" placeholder="Details, context, next steps...">${esc(r.notes)}</textarea></div>
     <div class="modal-actions">
-      ${editing? `<button class="btn danger ghost" id="delStaffBtn" style="margin-right:auto">Remove</button>`:''}
+      ${editing ? `<button class="btn danger" id="deleteCrmBtn">Delete</button>` : ''}
       <button class="btn ghost" onclick="closeModal()">Cancel</button>
-      <button class="btn primary" id="saveStaffBtn">${editing?'Save':'Add'}</button>
+      <button class="btn primary" id="saveCrmBtn">${editing ? 'Save changes' : 'Create record'}</button>
     </div>
   `);
-  if(editing) document.getElementById('delStaffBtn').onclick = async ()=>{
-    if(!confirm('Remove this employee?')) return;
-    await Store.remove('mg_employees', id);
-    await refreshAll(); closeModal(); render(); toast('Removed');
-  };
-  document.getElementById('saveStaffBtn').onclick = async ()=>{
-    const name = document.getElementById('f_name').value.trim();
-    if(!name){ toast('Name required'); return; }
+  // Keep status options in sync with chosen record type
+  document.getElementById('c_type').addEventListener('change', function() {
+    const meta = crmTypeMeta(this.value);
+    document.getElementById('c_status').innerHTML = meta.statuses.map(st => `<option value="${st}">${st}</option>`).join('');
+  });
+  document.getElementById('saveCrmBtn').onclick = async () => {
     const data = {
-      name,
-      role: document.getElementById('f_role').value.trim(),
-      division: document.getElementById('f_division').value,
-      phone: document.getElementById('f_phone').value.trim(),
-      email: document.getElementById('f_email').value.trim(),
-      status: document.getElementById('f_status').value,
-      startDate: document.getElementById('f_startDate').value,
-      salary: document.getElementById('f_salary').value || null
+      type: document.getElementById('c_type').value,
+      division: document.getElementById('c_division').value,
+      client: document.getElementById('c_client').value.trim(),
+      email: document.getElementById('c_email').value.trim(),
+      phone: document.getElementById('c_phone').value.trim(),
+      ref: document.getElementById('c_ref').value.trim(),
+      amount: Number(document.getElementById('c_amount').value) || 0,
+      status: document.getElementById('c_status').value,
+      notes: document.getElementById('c_notes').value.trim()
     };
-    if(editing){ await Store.update('mg_employees', id, data); } else { await Store.add('mg_employees', data); }
-    await refreshAll(); closeModal(); render(); toast(editing?'Saved':'Added');
+    if (!data.client) { toast('Client name is required'); return; }
+    try {
+      if (editing) { await Store.update('mg_crm', id, data); toast('✅ Record saved'); }
+      else { await Store.add('mg_crm', data); toast('✅ Record created'); }
+      await refreshAll(); closeModal(); render();
+    } catch (e) { toast('Error: ' + e.message); }
   };
+  if (editing) {
+    document.getElementById('deleteCrmBtn').onclick = async () => {
+      if (!confirm('Delete this CRM record permanently?')) return;
+      try { await Store.remove('mg_crm', id); await refreshAll(); closeModal(); render(); toast('Deleted'); }
+      catch (e) { toast('Error: ' + e.message); }
+    };
+  }
 }
 
-/* =========================================================================
-   FREELANCERS + ACTIVITY (NEW)
-========================================================================= */
-function renderFreelancers(v, ta){
-  ta.innerHTML = state.user ? `<button class="btn primary sm" id="addFlBtn">+ Add Freelancer</button><button class="btn ghost sm" id="logActBtn">+ Log Activity</button>` : '';
-  if(document.getElementById('addFlBtn')) document.getElementById('addFlBtn').onclick = ()=> openFreelancerModal();
-  if(document.getElementById('logActBtn')) document.getElementById('logActBtn').onclick = ()=> openActivityModal();
+// ─── APPROVALS (REAL — reads/writes mg_approvals, persists) ───────
+function renderApprovals(v, ta) {
+  ta.style.display = 'flex';
+  ta.innerHTML = state.user ? `<button class="btn primary sm" onclick="openApprovalModal()">+ New Request</button>` : '';
+  const pendingCount = state.approvals.filter(a => a.status === 'Pending').length;
+  document.getElementById('apprBadge').textContent = pendingCount;
 
   v.innerHTML = `
-    <div class="section-title"><h2>Freelancers</h2><span class="hint">${state.freelancers.length} on record</span></div>
-    <div class="grid cols-3" id="flCards"></div>
+    <div class="section-title"><h2>📋 Approval Centre</h2><span class="hint">${pendingCount} pending</span></div>
+    <div class="card" style="padding:6px 0;">
+      ${state.approvals.filter(a => a.status === 'Pending').map(a => `
+        <div class="approval-row">
+          <div class="ap-main">
+            <div class="ap-title">${esc(a.type)} — ${esc(a.requester)}</div>
+            <div class="ap-sub">${a.amount ? 'R ' + Number(a.amount).toLocaleString() : '—'} · ${fmtDate(a._createdAt)}</div>
+          </div>
+          <div class="ap-actions">
+            <button class="btn success sm" onclick="approveAction('${a.id}')">✓</button>
+            <button class="btn danger sm" onclick="rejectAction('${a.id}')">✕</button>
+          </div>
+        </div>
+      `).join('') || '<div class="table-empty">🎉 All clear! No pending approvals.</div>'}
+    </div>
+    <div class="grid cols-3" style="margin-top:12px;">
+      <div class="card"><h3 style="font-size:12px;font-weight:700;">📊 Stats</h3><div style="font-size:11px;color:var(--text-faint);margin-top:6px;">Total: ${state.approvals.length}<br>Pending: ${pendingCount}<br>Approved: ${state.approvals.filter(a => a.status === 'Approved').length}<br>Rejected: ${state.approvals.filter(a => a.status === 'Rejected').length}</div></div>
+      <div class="card"><h3 style="font-size:12px;font-weight:700;">⚡ Quick Add</h3><div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;">${APPROVAL_TYPES.map(t => `<button class="btn sm" onclick="openApprovalModal(null,'${t}')">${t}</button>`).join('')}</div></div>
+      <div class="card"><h3 style="font-size:12px;font-weight:700;">📱 Mobile Approve</h3><div style="font-size:11px;color:var(--text-faint);margin-top:6px;">Not built yet — v1.2 roadmap item</div></div>
+    </div>
+  `;
+}
+function openApprovalModal(id, presetType) {
+  if (!state.user) { toast('Sign in to submit approval requests'); return; }
+  openModal(`
+    <h3>New Approval Request</h3>
+    <div class="field"><label>Type</label><select id="ap_type">${APPROVAL_TYPES.map(t => `<option ${presetType===t?'selected':''}>${t}</option>`).join('')}</select></div>
+    <div class="field"><label>Requester</label><input id="ap_requester" placeholder="Name"></div>
+    <div class="field"><label>Amount (R, optional)</label><input id="ap_amount" type="number" placeholder="0.00"></div>
+    <div class="field"><label>Notes</label><textarea id="ap_notes" placeholder="Reason / details"></textarea></div>
+    <div class="modal-actions"><button class="btn ghost" onclick="closeModal()">Cancel</button><button class="btn primary" id="saveApBtn">Submit</button></div>
+  `);
+  document.getElementById('saveApBtn').onclick = async () => {
+    const data = { type: document.getElementById('ap_type').value, requester: document.getElementById('ap_requester').value.trim(), amount: Number(document.getElementById('ap_amount').value) || null, notes: document.getElementById('ap_notes').value.trim(), status: 'Pending' };
+    if (!data.requester) { toast('Requester name is required'); return; }
+    try { await Store.add('mg_approvals', data); await refreshAll(); closeModal(); render(); toast('Submitted'); }
+    catch (e) { toast('Error: ' + e.message); }
+  };
+}
+async function approveAction(id) {
+  try { await Store.update('mg_approvals', id, { status: 'Approved' }); await refreshAll(); render(); toast('✅ Approved'); }
+  catch (e) { toast('Error: ' + e.message); }
+}
+async function rejectAction(id) {
+  try { await Store.update('mg_approvals', id, { status: 'Rejected' }); await refreshAll(); render(); toast('❌ Rejected'); }
+  catch (e) { toast('Error: ' + e.message); }
+}
 
-    <div class="section-title"><h2>Activity Log</h2></div>
+// ─── STAFF ─────────────────────────────────────────────────────────
+function renderStaff(v, ta) {
+  ta.style.display = 'flex';
+  ta.innerHTML = state.user && state.isAdmin ? `<button class="btn primary sm" onclick="openStaffModal()">+ Add Employee</button>` : '';
+  v.innerHTML = `
+    <div class="section-title"><h2>👤 Staff / HR Portal</h2><span class="hint">${state.employees.length} employees</span></div>
     <div class="table-wrap">
-      <div class="table-toolbar">
-        <select id="actFlFilter"><option value="all">All freelancers</option>${state.freelancers.map(f=>`<option value="${f.id}">${esc(f.name)}</option>`).join('')}</select>
-        <input id="actDateFilter" type="date" style="max-width:160px">
-        <span style="margin-left:auto;color:var(--text-faint);font-family:var(--font-mono);font-size:11px">${state.activity.length} entries</span>
-      </div>
       <div class="table-scroll">
-        <table><thead><tr><th>Date</th><th>Freelancer</th><th>Type</th><th>Client</th><th>Notes</th><th>Status</th><th></th></tr></thead>
-        <tbody id="actRows"></tbody></table>
+        <table><thead><tr><th>Name</th><th>Role</th><th>Division</th><th>Phone</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            ${state.employees.length ? state.employees.map(e => `
+              <tr>
+                <td class="cell-main">${esc(e.name)}</td>
+                <td>${esc(e.role || '—')}</td>
+                <td><span class="dtag" style="--dc:${divisionById(e.division).color}"><span class="dot"></span>${esc(divisionById(e.division).short)}</span></td>
+                <td>${esc(e.phone || '—')}</td>
+                <td><span class="badge ${e.status === 'Active' ? 'b-done' : 'b-lost'}">${esc(e.status || 'Active')}</span></td>
+                <td><button class="icon-btn" onclick="openStaffModal('${e.id}')">✎</button></td>
+              </tr>
+            `).join('') : '<tr><td colspan="6" class="table-empty">No employees yet.</td></tr>'}
+          </tbody>
+        </table>
       </div>
     </div>
   `;
-
-  const flCards = document.getElementById('flCards');
-  if(!state.freelancers.length) flCards.appendChild(el(`<div class="card"><div class="empty-state"><div class="msg">No freelancers added yet.</div></div></div>`));
-  state.freelancers.forEach(f=>{
-    const today = todayISO();
-    const activeToday = state.activity.some(a=>a.freelancerId===f.id && a.date===today);
-    const count = state.activity.filter(a=>a.freelancerId===f.id).length;
-    flCards.appendChild(el(`
-      <div class="card">
-        <div class="freelancer-row">
-          <div class="avatar">${esc((f.name||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase())}</div>
-          <div style="flex:1">
-            <div class="cell-main">${esc(f.name)}</div>
-            <div class="cell-sub">${esc(f.role||'Freelancer')} · <span class="dtag" style="--dc:${divisionById(f.division).color};padding:1px 6px"><span class="dot"></span>${esc(divisionById(f.division).short)}</span></div>
-          </div>
-          <span class="badge ${activeToday?'b-done':'b-neutral'}">${activeToday?'Active today':'Quiet today'}</span>
-        </div>
-        <div class="dh-stats" style="margin-top:12px">
-          <div class="dh-stat"><b>${count}</b><span>Entries</span></div>
-          <div class="dh-stat"><b>${esc(f.phone||'—')}</b><span>Contact</span></div>
-        </div>
-        <div class="dh-actions"><button class="btn sm ghost" data-fl-edit="${f.id}">Edit</button></div>
-      </div>
-    `));
-  });
-  flCards.querySelectorAll('[data-fl-edit]').forEach(b=> b.onclick = ()=> openFreelancerModal(b.dataset.flEdit));
-
-  const renderActRows = () => {
-    const fl = document.getElementById('actFlFilter').value;
-    const dv = document.getElementById('actDateFilter').value;
-    let rows = state.activity.slice().sort((a,b)=>(b._createdAt||0)-(a._createdAt||0));
-    if(fl!=='all') rows = rows.filter(a=>a.freelancerId===fl);
-    if(dv) rows = rows.filter(a=>a.date===dv);
-    document.getElementById('actRows').innerHTML = rows.length ? rows.map(a=>{
-      const f = state.freelancers.find(x=>x.id===a.freelancerId) || {name:'Unknown'};
-      return `<tr>
-        <td style="font-family:var(--font-mono);font-size:11.5px;color:var(--text-dim)">${fmtDate(a.date)}</td>
-        <td class="cell-main">${esc(f.name)}</td>
-        <td>${esc(a.actType||'—')}</td>
-        <td>${esc(a.client||'—')}</td>
-        <td style="max-width:260px;color:var(--text-dim)">${esc(a.notes||'')}</td>
-        <td><span class="badge b-neutral">${esc(a.status||'Logged')}</span></td>
-        <td>${state.isAdmin?`<button class="icon-btn" data-act-del="${a.id}" title="Delete">🗑</button>`:''}</td>
-      </tr>`;
-    }).join('') : `<tr><td colspan="7" class="table-empty">No activity for this filter.</td></tr>`;
-    document.querySelectorAll('[data-act-del]').forEach(b=>b.onclick=async()=>{if(!confirm('Delete?'))return; await Store.remove('mg_activity',b.dataset.actDel); await refreshAll(); render(); toast('Deleted');});
-  };
-  document.getElementById('actFlFilter').onchange = renderActRows;
-  document.getElementById('actDateFilter').onchange = renderActRows;
-  renderActRows();
 }
-function openFreelancerModal(id){
-  if(!state.user){ toast('Sign in'); return; }
+function openStaffModal(id) {
   const editing = !!id;
-  const f = editing ? state.freelancers.find(x=>x.id===id) : {name:'', role:'', division:state.divisions[0]?.id, phone:''};
+  const e = editing ? state.employees.find(x => x.id === id) : { name: '', role: '', division: state.divisions[0]?.id || 'citm', phone: '', status: 'Active' };
   openModal(`
-    <h3>${editing?'Edit Freelancer':'Add Freelancer'}</h3>
-    <div class="field"><label>Name</label><input id="f_name" value="${esc(f.name)}"></div>
-    <div class="field-row">
-      <div class="field"><label>Role</label><input id="f_role" value="${esc(f.role)}"></div>
-      <div class="field"><label>Division</label><select id="f_division">${state.divisions.map(d=>`<option value="${d.id}" ${f.division===d.id?'selected':''}>${esc(d.name)}</option>`).join('')}</select></div>
-    </div>
-    <div class="field"><label>Phone</label><input id="f_phone" value="${esc(f.phone)}"></div>
-    <div class="modal-actions">
-      ${editing?`<button class="btn danger ghost" id="delFlBtn" style="margin-right:auto">Remove</button>`:''}
-      <button class="btn ghost" onclick="closeModal()">Cancel</button>
-      <button class="btn primary" id="saveFlBtn">${editing?'Save':'Add'}</button>
-    </div>
+    <h3>${editing ? 'Edit Employee' : 'Add Employee'}</h3>
+    <div class="field"><label>Full Name</label><input id="f_name" value="${esc(e.name)}"></div>
+    <div class="field-row"><div class="field"><label>Role</label><input id="f_role" value="${esc(e.role)}"></div><div class="field"><label>Division</label><select id="f_division">${state.divisions.map(d => `<option value="${d.id}" ${e.division === d.id ? 'selected' : ''}>${d.name}</option>`).join('')}</select></div></div>
+    <div class="field-row"><div class="field"><label>Phone</label><input id="f_phone" value="${esc(e.phone)}"></div><div class="field"><label>Status</label><select id="f_status"><option ${e.status === 'Active' ? 'selected' : ''}>Active</option><option ${e.status === 'Probation' ? 'selected' : ''}>Probation</option><option ${e.status === 'On Leave' ? 'selected' : ''}>On Leave</option><option ${e.status === 'Terminated' ? 'selected' : ''}>Terminated</option></select></div></div>
+    <div class="modal-actions">${editing ? `<button class="btn danger" id="delStaffBtn">Delete</button>` : ''}<button class="btn ghost" onclick="closeModal()">Cancel</button><button class="btn primary" id="saveStaffBtn">${editing ? 'Save' : 'Add'}</button></div>
   `);
-  if(editing) document.getElementById('delFlBtn').onclick = async ()=>{
-    if(!confirm('Remove this freelancer?')) return;
-    await Store.remove('mg_freelancers', id); await refreshAll(); closeModal(); render(); toast('Removed');
+  document.getElementById('saveStaffBtn').onclick = async () => {
+    try {
+      const data = { name: document.getElementById('f_name').value.trim(), role: document.getElementById('f_role').value.trim(), division: document.getElementById('f_division').value, phone: document.getElementById('f_phone').value.trim(), status: document.getElementById('f_status').value };
+      if (!data.name) { toast('Name is required'); return; }
+      if (editing) { await Store.update('mg_employees', id, data); } else { await Store.add('mg_employees', data); }
+      await refreshAll(); closeModal(); render(); toast(editing ? 'Saved' : 'Added');
+    } catch (e) { toast('Error: ' + e.message); }
   };
-  document.getElementById('saveFlBtn').onclick = async ()=>{
-    const name = document.getElementById('f_name').value.trim();
-    if(!name){ toast('Name required'); return; }
-    const data = {name, role: document.getElementById('f_role').value.trim(), division: document.getElementById('f_division').value, phone: document.getElementById('f_phone').value.trim()};
-    if(editing){ await Store.update('mg_freelancers', id, data); } else { await Store.add('mg_freelancers', data); }
-    await refreshAll(); closeModal(); render(); toast(editing?'Saved':'Added');
+  if (editing) {
+    document.getElementById('delStaffBtn').onclick = async () => {
+      if (!confirm('Remove this employee record?')) return;
+      try { await Store.remove('mg_employees', id); await refreshAll(); closeModal(); render(); toast('Removed'); }
+      catch (e) { toast('Error: ' + e.message); }
+    };
+  }
+}
+
+// ─── FREELANCERS (REAL — mg_freelancers + mg_activity) ────────────
+function renderFreelancers(v, ta) {
+  ta.style.display = 'flex';
+  ta.innerHTML = state.user ? `<button class="btn primary sm" onclick="openFreelancerModal()">+ Add</button><button class="btn ghost sm" onclick="openActivityModal()">+ Log activity</button>` : '';
+  v.innerHTML = `
+    <div class="section-title"><h2>🧑‍💻 Freelancers</h2><span class="hint">${state.freelancers.length} on record</span></div>
+    <div class="grid cols-3" id="flCards">${state.freelancers.map(f => `
+      <div class="card"><div class="freelancer-row"><div class="avatar">${esc((f.name || '?').split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase())}</div>
+        <div style="flex:1;"><div class="cell-main">${esc(f.name)}</div><div class="cell-sub">${esc(f.role || 'Freelancer')} · <span class="dtag" style="--dc:${divisionById(f.division).color};padding:1px 6px"><span class="dot"></span>${esc(divisionById(f.division).short)}</span></div></div>
+        <span class="badge b-neutral">${state.activity.filter(a => a.freelancerId === f.id && a.date === todayISO()).length ? 'Active today' : 'Quiet'}</span>
+        <button class="icon-btn" onclick="openFreelancerModal('${f.id}')">✎</button>
+      </div></div>
+    `).join('') || '<div class="card"><div class="empty-state">No freelancers added yet.</div></div>'}</div>
+    <div class="section-title"><h2>📋 Activity Log</h2></div>
+    <div class="table-wrap"><div class="table-scroll"><table><thead><tr><th>Date</th><th>Freelancer</th><th>Type</th><th>Client</th><th>Status</th></tr></thead>
+      <tbody>${state.activity.slice().sort((a,b)=>(b._createdAt||0)-(a._createdAt||0)).slice(0,15).map(a => {
+        const f = state.freelancers.find(x => x.id === a.freelancerId) || { name: 'Unknown' };
+        return `<tr><td style="font-size:11px;color:var(--text-faint);">${fmtDate(a.date)}</td><td>${esc(f.name)}</td><td>${esc(a.actType || '—')}</td><td>${esc(a.client || '—')}</td><td><span class="badge b-neutral">${esc(a.status || 'Logged')}</span></td></tr>`;
+      }).join('') || '<tr><td colspan="5" class="table-empty">No activity logged.</td></tr>'}</tbody></table></div></div>
+  `;
+}
+function openFreelancerModal(id) {
+  if (!state.user) { toast('Sign in to manage freelancers'); return; }
+  const editing = !!id;
+  const f = editing ? state.freelancers.find(x => x.id === id) : { name: '', role: '', division: state.divisions[0]?.id || 'citm', phone: '', rate: '' };
+  openModal(`
+    <h3>${editing ? 'Edit Freelancer' : 'Add Freelancer'}</h3>
+    <div class="field"><label>Name</label><input id="fl_name" value="${esc(f.name)}"></div>
+    <div class="field-row"><div class="field"><label>Role</label><input id="fl_role" value="${esc(f.role)}" placeholder="e.g. Field Technician"></div><div class="field"><label>Division</label><select id="fl_division">${state.divisions.map(d => `<option value="${d.id}" ${f.division === d.id ? 'selected' : ''}>${d.name}</option>`).join('')}</select></div></div>
+    <div class="field-row"><div class="field"><label>Phone</label><input id="fl_phone" value="${esc(f.phone)}"></div><div class="field"><label>Rate (R/day)</label><input id="fl_rate" type="number" value="${esc(f.rate)}"></div></div>
+    <div class="modal-actions">${editing ? `<button class="btn danger" id="delFlBtn">Delete</button>` : ''}<button class="btn ghost" onclick="closeModal()">Cancel</button><button class="btn primary" id="saveFlBtn">${editing ? 'Save' : 'Add'}</button></div>
+  `);
+  document.getElementById('saveFlBtn').onclick = async () => {
+    const data = { name: document.getElementById('fl_name').value.trim(), role: document.getElementById('fl_role').value.trim(), division: document.getElementById('fl_division').value, phone: document.getElementById('fl_phone').value.trim(), rate: Number(document.getElementById('fl_rate').value) || 0 };
+    if (!data.name) { toast('Name is required'); return; }
+    try {
+      if (editing) await Store.update('mg_freelancers', id, data); else await Store.add('mg_freelancers', data);
+      await refreshAll(); closeModal(); render(); toast(editing ? 'Saved' : 'Added');
+    } catch (e) { toast('Error: ' + e.message); }
+  };
+  if (editing) document.getElementById('delFlBtn').onclick = async () => {
+    if (!confirm('Delete this freelancer?')) return;
+    try { await Store.remove('mg_freelancers', id); await refreshAll(); closeModal(); render(); toast('Deleted'); } catch (e) { toast('Error: ' + e.message); }
   };
 }
-function openActivityModal(){
-  if(!state.freelancers.length){ toast('Add freelancers first'); return; }
+function openActivityModal() {
+  if (!state.user) { toast('Sign in to log activity'); return; }
+  if (!state.freelancers.length) { toast('Add a freelancer first'); return; }
   openModal(`
     <h3>Log Activity</h3>
-    <div class="field-row">
-      <div class="field"><label>Freelancer</label><select id="f_freelancer">${state.freelancers.map(f=>`<option value="${f.id}">${esc(f.name)}</option>`).join('')}</select></div>
-      <div class="field"><label>Date</label><input id="f_date" type="date" value="${todayISO()}"></div>
-    </div>
-    <div class="field"><label>Type</label><select id="f_actType">${ACTIVITY_TYPES.map(t=>`<option>${t}</option>`).join('')}</select></div>
-    <div class="field"><label>Client</label><input id="f_client"></div>
-    <div class="field"><label>Notes</label><textarea id="f_notes"></textarea></div>
-    <div class="field"><label>Status</label><select id="f_status"><option>Logged</option><option>Needs follow-up</option><option>Completed</option></select></div>
+    <div class="field"><label>Freelancer</label><select id="act_fl">${state.freelancers.map(f => `<option value="${f.id}">${esc(f.name)}</option>`).join('')}</select></div>
+    <div class="field-row"><div class="field"><label>Date</label><input id="act_date" type="date" value="${todayISO()}"></div><div class="field"><label>Activity type</label><select id="act_type">${['Sales call/visit','Quotation submitted','Job card completed','Marketing task','Client follow-up','Site visit','Admin/other'].map(t=>`<option>${t}</option>`).join('')}</select></div></div>
+    <div class="field"><label>Client</label><input id="act_client" placeholder="Client name"></div>
+    <div class="field"><label>Notes</label><textarea id="act_notes"></textarea></div>
     <div class="modal-actions"><button class="btn ghost" onclick="closeModal()">Cancel</button><button class="btn primary" id="saveActBtn">Log</button></div>
   `);
-  document.getElementById('saveActBtn').onclick = async ()=>{
-    const data = {
-      freelancerId: document.getElementById('f_freelancer').value,
-      date: document.getElementById('f_date').value || todayISO(),
-      actType: document.getElementById('f_actType').value,
-      client: document.getElementById('f_client').value.trim(),
-      notes: document.getElementById('f_notes').value.trim(),
-      status: document.getElementById('f_status').value
-    };
-    await Store.add('mg_activity', data);
-    await refreshAll(); closeModal(); render(); toast('Activity logged');
+  document.getElementById('saveActBtn').onclick = async () => {
+    const data = { freelancerId: document.getElementById('act_fl').value, date: document.getElementById('act_date').value, actType: document.getElementById('act_type').value, client: document.getElementById('act_client').value.trim(), notes: document.getElementById('act_notes').value.trim(), status: 'Logged' };
+    try { await Store.add('mg_activity', data); await refreshAll(); closeModal(); render(); toast('Activity logged'); }
+    catch (e) { toast('Error: ' + e.message); }
   };
 }
 
-/* =========================================================================
-   UNIFIED CALENDAR (NEW)
-========================================================================= */
-function renderCalendar(v, ta){
-  ta.innerHTML = `<button class="btn ghost sm" id="calToday">Today</button>`;
-  document.getElementById('calToday').onclick = ()=>{
-    state.calMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-    renderCalendar();
-  };
-
+// ─── FLEET (REAL — mg_fleet, no seed data) ────────────────────────
+function renderFleet(v, ta) {
+  ta.style.display = 'flex';
+  ta.innerHTML = state.user ? `<button class="btn primary sm" onclick="openFleetModal()">+ Add Vehicle</button>` : '';
   v.innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-      <div style="display:flex;gap:10px;align-items:center;">
-        <button class="btn sm ghost" id="calPrev">‹</button>
-        <span style="font-weight:700;font-size:18px;" id="calMonthLabel"></span>
-        <button class="btn sm ghost" id="calNext">›</button>
-      </div>
-      <span style="color:var(--text-faint);font-size:12px;">Tasks · Follow-ups · Cleaning · SLA</span>
+    <div class="section-title"><h2>🚗 Fleet Management</h2><span class="hint">${state.fleet.length} vehicles</span></div>
+    <div class="card" style="padding:6px 0;">
+      ${state.fleet.length ? state.fleet.map(f => `
+        <div class="fleet-row">
+          <span class="plate">${esc(f.reg)}</span>
+          <div style="flex:1;"><div style="font-weight:600;font-size:12.5px;">${esc(f.make)} ${esc(f.model)}</div><div style="font-size:10.5px;color:var(--text-faint);">${esc(f.driver || 'Unassigned')} · ${Number(f.mileage||0).toLocaleString()} km</div></div>
+          <div style="text-align:right;"><div style="font-weight:700;font-size:12px;">${f.fuel ?? '—'}%</div><div style="font-size:9px;color:var(--text-faint);">Fuel</div></div>
+          <span class="badge ${f.status === 'Active' ? 'b-done' : f.status === 'Service' ? 'b-progress' : 'b-neutral'}">${esc(f.status)}</span>
+          <button class="icon-btn" onclick="openFleetModal('${f.id}')">✎</button>
+        </div>
+      `).join('') : '<div class="table-empty">No vehicles logged yet.</div>'}
     </div>
-    <div class="card">
-      <div class="cal-grid" id="calGrid"></div>
-    </div>
-    <div id="calSelectedTasks" style="margin-top:16px;"></div>
   `;
-
-  const renderCal = () => {
-    const m = state.calMonth;
-    document.getElementById('calMonthLabel').textContent = m.toLocaleDateString('en-ZA', {month:'long', year:'numeric'});
-    const first = new Date(m.getFullYear(), m.getMonth(), 1);
-    const startOffset = first.getDay();
-    const daysInMonth = new Date(m.getFullYear(), m.getMonth()+1, 0).getDate();
-    const grid = document.getElementById('calGrid');
-    grid.innerHTML = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>`<div class="cal-dow">${d}</div>`).join('');
-    const todayStr = todayISO();
-    const totalCells = Math.ceil((startOffset+daysInMonth)/7)*7;
-
-    // Gather events: tasks + CRM follow-ups + cleaning jobs + SLA deadlines
-    const allEvents = [];
-    state.tasks.forEach(t => {
-      if(t.dueDate) allEvents.push({ date: t.dueDate, label: t.title, type: 'task', status: t.status });
-    });
-    state.crm.forEach(c => {
-      if(c.followUpDate) allEvents.push({ date: c.followUpDate, label: `📞 ${c.client}`, type: 'followup' });
-    });
-    // Add cleaning jobs
-    state.stats._rawCleanTickets = state.stats._rawCleanTickets || [];
-    state.stats._rawCleanTickets.forEach(t => {
-      if(t.scheduledDate) allEvents.push({ date: t.scheduledDate, label: `🧹 ${t.clientName}`, type: 'cleaning' });
-    });
-    // SLA deadlines: tickets with open status
-    state.stats._rawITTickets = state.stats._rawITTickets || [];
-    state.stats._rawITTickets.forEach(t => {
-      if(t.status !== 'closed' && t.status !== 'resolved') {
-        const d = getDateValue(t.createdAt);
-        if(d) {
-          const hours = { Urgent:4, High:8, Medium:24, Low:48 }[t.priority] || 24;
-          const deadline = new Date(d.getTime() + hours * 3600 * 1000);
-          const dateStr = deadline.toISOString().slice(0,10);
-          allEvents.push({ date: dateStr, label: `⏱️ ${t.ref} SLA`, type: 'sla' });
-        }
-      }
-    });
-
-    for(let i=0;i<totalCells;i++){
-      const dayNum = i - startOffset + 1;
-      const inMonth = dayNum>=1 && dayNum<=daysInMonth;
-      const dateStr = inMonth ? `${m.getFullYear()}-${String(m.getMonth()+1).padStart(2,'0')}-${String(dayNum).padStart(2,'0')}` : null;
-      const dayEvents = inMonth ? allEvents.filter(e=>e.date===dateStr) : [];
-      const cell = el(`<div class="cal-cell ${!inMonth?'faded':''} ${dateStr===todayStr?'today':''}">
-          <div class="d">${inMonth?dayNum:''}</div>
-          <div class="items">
-            ${dayEvents.slice(0,3).map(e => `<div class="cal-chip" style="${e.type==='sla'?'color:var(--red)':e.type==='cleaning'?'color:var(--amber)':''}">${esc(e.label)}</div>`).join('')}
-            ${dayEvents.length>3?`<div class="cal-more">+${dayEvents.length-3} more</div>`:''}
-          </div>
-        </div>`);
-      if(inMonth) cell.onclick = ()=>{
-        document.getElementById('calSelectedTasks').innerHTML = `
-          <div class="card">
-            <div class="cell-main" style="margin-bottom:8px">${fmtDate(dateStr)}</div>
-            ${dayEvents.length ? dayEvents.map(e=>`<div style="padding:6px 0;border-bottom:1px solid var(--border-soft);font-size:12px;">${esc(e.label)}</div>`).join('') : '<div class="cell-sub">Nothing scheduled.</div>'}
-          </div>`;
-      };
-      grid.appendChild(cell);
-    }
+}
+function openFleetModal(id) {
+  if (!state.user) { toast('Sign in to manage fleet records'); return; }
+  const editing = !!id;
+  const f = editing ? state.fleet.find(x => x.id === id) : { reg: '', make: '', model: '', driver: '', mileage: '', fuel: '', status: 'Active' };
+  openModal(`
+    <h3>${editing ? 'Edit Vehicle' : 'Add Vehicle'}</h3>
+    <div class="field-row"><div class="field"><label>Registration</label><input id="fv_reg" value="${esc(f.reg)}" placeholder="e.g. CA 123-456"></div><div class="field"><label>Status</label><select id="fv_status">${FLEET_STATUSES.map(s=>`<option ${f.status===s?'selected':''}>${s}</option>`).join('')}</select></div></div>
+    <div class="field-row"><div class="field"><label>Make</label><input id="fv_make" value="${esc(f.make)}"></div><div class="field"><label>Model</label><input id="fv_model" value="${esc(f.model)}"></div></div>
+    <div class="field-row"><div class="field"><label>Driver</label><input id="fv_driver" value="${esc(f.driver)}"></div><div class="field"><label>Mileage (km)</label><input id="fv_mileage" type="number" value="${esc(f.mileage)}"></div></div>
+    <div class="field"><label>Fuel level (%)</label><input id="fv_fuel" type="number" min="0" max="100" value="${esc(f.fuel)}"></div>
+    <div class="modal-actions">${editing ? `<button class="btn danger" id="delFvBtn">Delete</button>` : ''}<button class="btn ghost" onclick="closeModal()">Cancel</button><button class="btn primary" id="saveFvBtn">${editing?'Save':'Add'}</button></div>
+  `);
+  document.getElementById('saveFvBtn').onclick = async () => {
+    const data = { reg: document.getElementById('fv_reg').value.trim(), status: document.getElementById('fv_status').value, make: document.getElementById('fv_make').value.trim(), model: document.getElementById('fv_model').value.trim(), driver: document.getElementById('fv_driver').value.trim(), mileage: Number(document.getElementById('fv_mileage').value)||0, fuel: Number(document.getElementById('fv_fuel').value)||0 };
+    if (!data.reg) { toast('Registration is required'); return; }
+    try { if (editing) await Store.update('mg_fleet', id, data); else await Store.add('mg_fleet', data); await refreshAll(); closeModal(); render(); toast(editing?'Saved':'Added'); }
+    catch (e) { toast('Error: ' + e.message); }
   };
-
-  document.getElementById('calPrev').onclick = ()=>{
-    state.calMonth = new Date(state.calMonth.getFullYear(), state.calMonth.getMonth()-1, 1);
-    renderCal();
+  if (editing) document.getElementById('delFvBtn').onclick = async () => {
+    if (!confirm('Delete this vehicle record?')) return;
+    try { await Store.remove('mg_fleet', id); await refreshAll(); closeModal(); render(); toast('Deleted'); } catch (e) { toast('Error: ' + e.message); }
   };
-  document.getElementById('calNext').onclick = ()=>{
-    state.calMonth = new Date(state.calMonth.getFullYear(), state.calMonth.getMonth()+1, 1);
-    renderCal();
-  };
-  renderCal();
 }
 
-/* =========================================================================
-   SETTINGS (simplified – no user-enterable config for security)
-========================================================================= */
-function renderSettings(v, ta){
-  ta.innerHTML = '';
+// ─── FINANCE (computed from real invoice records) ─────────────────
+function renderFinance(v, ta) {
+  const invoices = state.crm.filter(r => r.type === 'invoice');
+  const totalRevenue = invoices.filter(r => r.status === 'Paid').reduce((a, c) => a + Number(c.amount || 0), 0);
+  const totalInvoiced = invoices.reduce((a, c) => a + Number(c.amount || 0), 0);
+  const outstanding = totalInvoiced - totalRevenue;
+  const unpaidCount = invoices.filter(r => r.status !== 'Paid').length;
   v.innerHTML = `
+    <div class="section-title"><h2>💰 Finance Centre</h2><span class="hint">Computed from mg_crm invoice records</span></div>
+    <div class="grid cols-4">
+      <div class="card kpi railed" style="--rail:var(--green)"><div class="kpi-top">Revenue (Paid)</div><div class="kpi-num">R${totalRevenue.toLocaleString()}</div><div class="kpi-foot">${invoices.length ? invoices.filter(r=>r.status==='Paid').length + ' paid invoices' : 'No invoices logged yet'}</div></div>
+      <div class="card kpi railed" style="--rail:var(--red)"><div class="kpi-top">Total Invoiced</div><div class="kpi-num">R${totalInvoiced.toLocaleString()}</div><div class="kpi-foot">${invoices.length} invoices total</div></div>
+      <div class="card kpi railed" style="--rail:var(--amber)"><div class="kpi-top">Outstanding</div><div class="kpi-num" style="color:var(--amber)">R${outstanding.toLocaleString()}</div><div class="kpi-foot">${unpaidCount} unpaid</div></div>
+      <div class="card kpi railed" style="--rail:var(--blue)"><div class="kpi-top">Approved spend (approvals)</div><div class="kpi-num">R${state.approvals.filter(a=>a.status==='Approved').reduce((s,a)=>s+Number(a.amount||0),0).toLocaleString()}</div><div class="kpi-foot">${state.approvals.filter(a=>a.status==='Approved').length} approved</div></div>
+    </div>
+    <div class="card"><h3 style="font-size:13px;font-weight:700;margin-bottom:8px;">📈 Cashflow</h3><div style="height:80px;background:var(--elevated);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--text-faint);font-size:12px;">Chart visualization not wired up yet — plug Chart.js against mg_crm invoice history here.</div></div>
+  `;
+}
+
+// ─── ASSETS (REAL — mg_assets, no seed data) ──────────────────────
+function renderAssets(v, ta) {
+  ta.style.display = 'flex';
+  ta.innerHTML = state.user ? `<button class="btn primary sm" onclick="openAssetModal()">+ Add Asset</button>` : '';
+  v.innerHTML = `
+    <div class="section-title"><h2>🖥️ Asset Centre</h2><span class="hint">${state.assets.length} assets</span></div>
+    <div class="at-grid">
+      ${state.assets.length ? state.assets.map(a => `
+        <div class="at-card">
+          <div class="at-top"><div class="at-icon">${(a.name||'').includes('Laptop')||(a.name||'').includes('Book') ? '💻' : (a.name||'').includes('Server') ? '🖥️' : (a.name||'').includes('Printer') ? '🖨️' : '📦'}</div><span class="at-qr">${esc((a.serial||'').slice(-4) || '—')}</span></div>
+          <div class="at-name">${esc(a.name)}</div>
+          <div class="at-sub">${esc(a.owner || '—')} · ${esc(a.location || '—')}</div>
+          <div style="margin-top:4px;display:flex;justify-content:space-between;align-items:center;"><span class="badge ${a.status === 'Active' ? 'b-done' : a.status === 'Maintenance' ? 'b-progress' : 'b-lost'}">${esc(a.status)}</span><button class="icon-btn" onclick="openAssetModal('${a.id}')">✎</button></div>
+        </div>
+      `).join('') : '<div class="card"><div class="empty-state">No assets logged yet.</div></div>'}
+    </div>
+  `;
+}
+function openAssetModal(id) {
+  if (!state.user) { toast('Sign in to manage assets'); return; }
+  const editing = !!id;
+  const a = editing ? state.assets.find(x => x.id === id) : { name: '', serial: '', owner: '', location: '', status: 'Active' };
+  openModal(`
+    <h3>${editing ? 'Edit Asset' : 'Add Asset'}</h3>
+    <div class="field"><label>Asset name</label><input id="as_name" value="${esc(a.name)}" placeholder="e.g. HP EliteBook 840 G8"></div>
+    <div class="field-row"><div class="field"><label>Serial number</label><input id="as_serial" value="${esc(a.serial)}"></div><div class="field"><label>Status</label><select id="as_status">${ASSET_STATUSES.map(s=>`<option ${a.status===s?'selected':''}>${s}</option>`).join('')}</select></div></div>
+    <div class="field-row"><div class="field"><label>Owner / assigned to</label><input id="as_owner" value="${esc(a.owner)}"></div><div class="field"><label>Location</label><input id="as_location" value="${esc(a.location)}"></div></div>
+    <div class="modal-actions">${editing ? `<button class="btn danger" id="delAsBtn">Delete</button>` : ''}<button class="btn ghost" onclick="closeModal()">Cancel</button><button class="btn primary" id="saveAsBtn">${editing?'Save':'Add'}</button></div>
+  `);
+  document.getElementById('saveAsBtn').onclick = async () => {
+    const data = { name: document.getElementById('as_name').value.trim(), serial: document.getElementById('as_serial').value.trim(), status: document.getElementById('as_status').value, owner: document.getElementById('as_owner').value.trim(), location: document.getElementById('as_location').value.trim() };
+    if (!data.name) { toast('Asset name is required'); return; }
+    try { if (editing) await Store.update('mg_assets', id, data); else await Store.add('mg_assets', data); await refreshAll(); closeModal(); render(); toast(editing?'Saved':'Added'); }
+    catch (e) { toast('Error: ' + e.message); }
+  };
+  if (editing) document.getElementById('delAsBtn').onclick = async () => {
+    if (!confirm('Delete this asset?')) return;
+    try { await Store.remove('mg_assets', id); await refreshAll(); closeModal(); render(); toast('Deleted'); } catch (e) { toast('Error: ' + e.message); }
+  };
+}
+
+// ─── PROCUREMENT ────────────────────────────────────────────────────
+function renderProcurement(v, ta) {
+  v.innerHTML = `
+    <div class="section-title"><h2>📦 Procurement</h2><span class="hint">${state.procurement.length} PO records</span></div>
+    <div class="card" style="border-left:3px solid var(--amber);margin-bottom:12px;"><div style="font-size:11.5px;color:var(--amber);">This module reads mg_procurement but has no create/edit form yet — v1.2 roadmap item. Log records directly in Firestore or ask for the form to be built next.</div></div>
+    <div class="table-wrap"><div class="table-scroll"><table><thead><tr><th>PO Ref</th><th>Supplier</th><th>Status</th><th>Amount</th></tr></thead>
+      <tbody>${state.procurement.length ? state.procurement.map(p => `<tr><td>${esc(p.ref||'—')}</td><td>${esc(p.supplier||'—')}</td><td><span class="badge b-neutral">${esc(p.status||'—')}</span></td><td>${p.amount?'R '+Number(p.amount).toLocaleString():'—'}</td></tr>`).join('') : '<tr><td colspan="4" class="table-empty">No procurement records in mg_procurement yet.</td></tr>'}</tbody>
+    </table></div></div>
+  `;
+}
+
+// ─── AI ASSISTANT (honest state: no live LLM backend wired in this static file) ─
+function renderAI(v, ta) {
+  v.innerHTML = `
+    <div class="section-title"><h2>🧠 MG AI Assistant</h2><span class="hint">Demo mode</span></div>
+    <div class="ai-shell">
+      <div class="ai-banner">⚠ Demo mode: replies below are illustrative, not generated from your live data. This file has no server-side key or backend function to call an LLM safely from the browser — wiring a real assistant needs a small server (e.g. a Firebase Cloud Function) that holds the API key and reads your Firestore data before calling the model. Ask for that function to be built as the next step.</div>
+      <div class="ai-msgs" id="aiMessages">
+        <div class="ai-row"><div class="ai-avatar">🤖</div><div class="ai-bubble">Good Morning, Moses. I'm running in demo mode right now — I can show you what the assistant will feel like, but I'm not yet connected to your live CRM, tickets or finance data. Try a suggestion below to see a sample response.</div></div>
+      </div>
+      <div class="ai-suggest">
+        ${['Revenue this month', 'Technicians free tomorrow', 'Unpaid invoices >R50k', 'Generate quote', 'Customer history'].map(s => `<span class="ai-chip" onclick="askAI('${s}')">${s}</span>`).join('')}
+      </div>
+      <div class="ai-input">
+        <input id="aiInput" placeholder="Ask MG AI anything (demo mode)..." onkeydown="if(event.key==='Enter') askAI(document.getElementById('aiInput').value)">
+        <button class="btn primary sm" onclick="askAI(document.getElementById('aiInput').value)">Send</button>
+      </div>
+    </div>
+  `;
+}
+function askAI(q) {
+  if (!q || !q.trim()) return;
+  const msgs = document.getElementById('aiMessages');
+  const input = document.getElementById('aiInput');
+  msgs.innerHTML += `<div class="ai-row me"><div class="ai-avatar">👤</div><div class="ai-bubble">${esc(q)}</div></div>`;
+  input.value = '';
+  setTimeout(() => {
+    msgs.innerHTML += `<div class="ai-row"><div class="ai-avatar">🤖</div><div class="ai-bubble">This is a sample response — in demo mode I can't query your real Firestore data. Once a backend function is wired up, I'll answer "${esc(q)}" using your actual CRM, ticket, and finance records.</div></div>`;
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 400);
+}
+
+// ─── REPORTS ──────────────────────────────────────────────────────
+function renderReports(v, ta) {
+  v.innerHTML = `
+    <div class="section-title"><h2>📄 Reports Centre</h2><span class="hint">PDF generation not wired up — v1.2 roadmap item</span></div>
+    <div class="card" style="border-left:3px solid var(--amber);margin-bottom:12px;"><div style="font-size:11.5px;color:var(--amber);">Clicking a report below shows the intended report list only — no PDF is generated yet. Wiring this up needs a PDF library (e.g. pdf-lib) fed from your real Firestore collections.</div></div>
+    <div class="report-grid">
+      ${[
+        { icon: '📊', name: 'CEO Report', sub: 'Weekly summary' },
+        { icon: '💰', name: 'Monthly Revenue', sub: 'Division breakdown' },
+        { icon: '🔧', name: 'Tech Performance', sub: 'SLA & tickets' },
+        { icon: '🧹', name: 'Cleaning Performance', sub: 'Jobs & satisfaction' },
+        { icon: '👤', name: 'Payroll', sub: 'Staff & costs' },
+        { icon: '📈', name: 'Sales', sub: 'Pipeline & wins' },
+        { icon: '📋', name: 'Projects', sub: 'Status & budget' },
+        { icon: '⭐', name: 'CSAT', sub: 'Customer feedback' }
+      ].map(r => `
+        <div class="report-card" onclick="toast('PDF generation for ${r.name} is not wired up yet')">
+          <div class="rc-icon">${r.icon}</div>
+          <div class="rc-name">${r.name}</div>
+          <div class="rc-sub">${r.sub}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// ─── SECURITY ─────────────────────────────────────────────────────
+function renderSecurity(v, ta) {
+  v.innerHTML = `
+    <div class="section-title"><h2>🛡️ Security Centre</h2><span class="hint">Not connected to a live security feed</span></div>
+    <div class="card" style="border-left:3px solid var(--amber);margin-bottom:12px;"><div style="font-size:11.5px;color:var(--amber);">This screen is a visual placeholder — it isn't pulling live data from Microsoft Secure Score, your firewall, or backup systems. Wiring it up needs API connectors to those services.</div></div>
+    <div class="grid cols-2">
+      <div class="card"><h3 style="font-size:13px;font-weight:700;margin-bottom:8px;">📊 Security Metrics (placeholder)</h3>
+        <div class="sec-grid">
+          ${[
+            { lbl: 'MS Secure Score', val: '—', color: 'var(--text-faint)' },
+            { lbl: 'Patch Compliance', val: '—', color: 'var(--text-faint)' },
+            { lbl: 'Firewall Status', val: '—', color: 'var(--text-faint)' },
+            { lbl: 'Backup Status', val: '—', color: 'var(--text-faint)' },
+            { lbl: 'Risk Level', val: '—', color: 'var(--text-faint)' },
+            { lbl: 'Threat Alerts', val: '—', color: 'var(--text-faint)' }
+          ].map(m => `<div class="sec-tile"><div class="val" style="color:${m.color};">${m.val}</div><div class="lbl">${m.lbl}</div></div>`).join('')}
+        </div>
+      </div>
+      <div class="card"><h3 style="font-size:13px;font-weight:700;margin-bottom:8px;">⚠️ Recent Security Events</h3><div class="empty-state">No live feed connected yet.</div></div>
+    </div>
+  `;
+}
+
+// ─── KNOWLEDGE BASE ──────────────────────────────────────────────
+function renderKnowledge(v, ta) {
+  v.innerHTML = `
+    <div class="section-title"><h2>🧠 Knowledge Base</h2><span class="hint">${state.knowledge.length} items in mg_knowledge</span></div>
+    <div class="kb-grid">
+      ${state.knowledge.length ? state.knowledge.map(k => `
+        <div class="kb-card"><div class="kb-ico">${k.icon || '📄'}</div><div><div class="kb-name">${esc(k.name)}</div><div class="kb-sub">${esc(k.sub||'')}</div></div></div>
+      `).join('') : '<div class="card" style="grid-column:1/-1;"><div class="empty-state">No knowledge base items logged yet in mg_knowledge.</div></div>'}
+    </div>
+  `;
+}
+
+// ─── AUDIT TRAIL (REAL — reads mg_audit, populated by every write above) ─
+function renderAudit(v, ta) {
+  v.innerHTML = `
+    <div class="section-title"><h2>📋 Audit Trail</h2><span class="hint">${state.audit.length} events logged</span></div>
+    <div class="table-wrap">
+      <div class="table-scroll">
+        <table><thead><tr><th>Time</th><th>User</th><th>Action</th><th>Target</th></tr></thead>
+          <tbody>
+            ${state.audit.length ? state.audit.map(a => `
+              <tr><td style="font-size:11px;color:var(--text-faint);">${new Date(a.timestamp).toLocaleString('en-ZA')}</td><td>${esc(a.user)}</td><td>${esc(a.action)}</td><td>${esc(a.target)}</td></tr>
+            `).join('') : '<tr><td colspan="4" class="table-empty">No events yet. Every create/update/delete across CRM, Staff, Approvals, Fleet and Assets writes here automatically.</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+// ─── CALENDAR ──────────────────────────────────────────────────────
+function renderCalendar(v, ta) {
+  v.innerHTML = `
+    <div class="section-title"><h2>📅 Unified Calendar</h2><span class="hint">Tasks · Follow-ups · Cleaning · SLA</span></div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button class="btn sm ghost" onclick="state.calMonth=new Date(state.calMonth.getFullYear(),state.calMonth.getMonth()-1,1);render();">‹</button>
+          <span style="font-weight:700;font-size:15px;">${state.calMonth.toLocaleDateString('en-ZA',{month:'long',year:'numeric'})}</span>
+          <button class="btn sm ghost" onclick="state.calMonth=new Date(state.calMonth.getFullYear(),state.calMonth.getMonth()+1,1);render();">›</button>
+        </div>
+        <button class="btn sm" onclick="state.calMonth=new Date();render();">Today</button>
+      </div>
+      <div class="cal-grid">
+        ${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d => `<div class="cal-dow">${d}</div>`).join('')}
+        ${Array.from({length:42}, (_, i) => {
+          const first = new Date(state.calMonth.getFullYear(), state.calMonth.getMonth(), 1);
+          const dayNum = i - first.getDay() + 1;
+          const inMonth = dayNum >= 1 && dayNum <= new Date(state.calMonth.getFullYear(), state.calMonth.getMonth()+1, 0).getDate();
+          const dateStr = inMonth ? `${state.calMonth.getFullYear()}-${String(state.calMonth.getMonth()+1).padStart(2,'0')}-${String(dayNum).padStart(2,'0')}` : null;
+          const events = dateStr ? state.tasks.filter(t => t.dueDate === dateStr).slice(0,2) : [];
+          return `<div class="cal-cell ${!inMonth?'faded':''} ${dateStr === todayISO()?'today':''}">
+            <div class="d">${inMonth ? dayNum : ''}</div>
+            ${events.map(e => `<div class="cal-chip">${esc(e.title)}</div>`).join('')}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// ─── SETTINGS ──────────────────────────────────────────────────────
+function renderSettings(v, ta) {
+  v.innerHTML = `
+    <div class="section-title"><h2>⚙️ Settings</h2></div>
     <div class="settings-block">
       <h3>🔐 Authentication</h3>
-      <div class="desc">Sign in with an admin email (${ADMIN_EMAILS.join(', ')}) to get full write access. Firebase config is hardcoded for production security.</div>
-      ${state.user ? `
-        <div class="auth-status">
-          <span class="pill ${state.isAdmin?'admin':''}">✅ Signed in as ${esc(state.user.email)} ${state.isAdmin?'(Admin)':''}</span>
-          <button class="btn danger sm" id="logoutBtn">Sign out</button>
-        </div>
-      ` : `
-        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;">
-          <div class="field" style="max-width:220px;margin:0;"><label>Email</label><input id="loginEmail" placeholder="admin@..."></div>
-          <div class="field" style="max-width:180px;margin:0;"><label>Password</label><input id="loginPass" type="password" placeholder="••••••••"></div>
-          <button class="btn primary" id="loginBtn">Sign in</button>
-        </div>
-      `}
+      <div class="desc">Admin emails (front-end allowlist, UX only): ${ADMIN_EMAILS.join(', ')}</div>
+      ${state.user ? `<div class="auth-status"><span class="pill ${state.isAdmin ? 'admin' : ''}">✅ Signed in as ${esc(state.user.email)} ${state.isAdmin ? '(Admin)' : ''}</span><button class="btn danger sm" onclick="signOut()">Sign out</button></div>`
+        : `<div style="display:flex;gap:8px;flex-wrap:wrap;"><div class="field" style="max-width:200px;margin:0;"><input id="settingsEmail" placeholder="admin@..."></div><div class="field" style="max-width:160px;margin:0;"><input id="settingsPass" type="password" placeholder="••••••••"></div><button class="btn primary" onclick="signIn(document.getElementById('settingsEmail').value, document.getElementById('settingsPass').value)">Sign in</button></div>`}
     </div>
-
     <div class="settings-block">
-      <h3>📡 System Status</h3>
-      <div class="desc">${state.firebaseReady ? '✅ Connected to Firestore (production)' : '⚠️ Not connected to Firestore'}</div>
-      <div style="background:var(--bg);padding:10px 14px;border-radius:8px;font-family:var(--font-mono);font-size:11px;color:var(--text-dim);word-break:break-all;">
-        Project: test-bot-49f99<br>
-        Auth: ${state.user ? state.user.email : 'Not signed in'}
-      </div>
+      <h3>🛡️ Security Rules — Not Yet Deployed</h3>
+      <div class="desc">The admin allowlist above lives in this JavaScript file, which anyone can read or bypass via the browser console. It only controls what buttons appear — it does <strong>not</strong> protect your Firestore data. Real protection requires Firestore Security Rules deployed on the <code>test-bot-49f99</code> project. A starting rule set has been provided alongside this file (firestore.rules) — it needs to be reviewed and deployed via the Firebase Console or CLI (<code>firebase deploy --only firestore:rules</code>) before this goes into real production use with sensitive data.</div>
     </div>
-
-    <div class="settings-block"><h3>💾 Data</h3><div class="desc">Export all data or reset local demo storage.</div><button class="btn sm" id="exportBtn">Export JSON</button> <button class="btn sm danger" id="resetBtn">Clear local data</button></div>
-
-    <div class="settings-block"><h3>🔒 Security Note</h3><div class="desc">The UI admin check (hiding Delete buttons) is a convenience. Firestore Security Rules (with <code class="inline">isAdmin()</code> checking email) are the real gate. Never rely on client-side checks alone.</div></div>
+    <div class="settings-block"><h3>📡 System Status</h3><div class="desc">${state.firebaseReady ? '✅ Connected to Firestore (Production Mode)' : '⚠️ Not connected — check network/config'}</div></div>
+    <div class="settings-block"><h3>💾 Data</h3><button class="btn sm" onclick="exportData()">Export JSON</button></div>
+    <div class="settings-block"><h3>🏗️ Multi-Tenant Engine</h3><div class="desc">${state.divisions.length} modules loaded. Division management UI is a v1.2 roadmap item — new divisions currently need to be added to the DIVISIONS constant in code.</div></div>
+    <div class="settings-block"><h3>🚧 Known Placeholders (v1.1)</h3><div class="desc">
+      • <strong>MG AI Assistant</strong> — demo replies only, no backend LLM call from this static file.<br>
+      • <strong>Reports Centre</strong> — no PDF generation wired up.<br>
+      • <strong>Security Centre</strong> — no live feed from MS Secure Score / firewall / backups.<br>
+      • <strong>Automation</strong> — visual reference of the intended workflow chain; no Cloud Functions triggering it yet.<br>
+      • <strong>Procurement</strong> — reads mg_procurement but has no create/edit form yet.<br>
+      • <strong>Division Hub "Add division"</strong> — not yet implemented.
+    </div></div>
   `;
-  if(!state.user){ document.getElementById('loginBtn').onclick = ()=>{ const e=document.getElementById('loginEmail').value; const p=document.getElementById('loginPass').value; if(e&&p) signIn(e,p); else toast('Enter email and password'); }; }
-  if(state.user){ document.getElementById('logoutBtn').onclick = signOut; }
-
-  document.getElementById('exportBtn').onclick = ()=>{
-    const payload={divisions:state.divisions, crm:state.crm, freelancers:state.freelancers, activity:state.activity, tasks:state.tasks, employees:state.employees, stats:state.stats, exportedAt:new Date().toISOString()};
-    const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(blob);
-    a.download=`mgcentral-export-${todayISO()}.json`;
-    a.click();
-  };
-  document.getElementById('resetBtn').onclick = async ()=>{
-    if(!confirm('Clear all local demo data?')) return;
-    ['mg_divisions','mg_crm','mg_freelancers','mg_activity','mg_tasks','mg_stats','mg_employees'].forEach(c=>localStorage.removeItem(LS_PREFIX+c));
-    await refreshAll(); render(); toast('Cleared');
-  };
+}
+function exportData() {
+  const payload = { divisions: state.divisions, crm: state.crm, employees: state.employees, assets: state.assets, fleet: state.fleet, approvals: state.approvals, freelancers: state.freelancers, activity: state.activity, exportedAt: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `mgcentral-export-${todayISO()}.json`; a.click();
 }
 
-/* =========================================================================
-   CLOCK & INIT
-========================================================================= */
-function tickClock(){ document.getElementById('clockFoot').textContent = new Date().toLocaleString('en-ZA', {weekday:'short', day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'}); }
-setInterval(tickClock, 1000*30);
+// ─── INIT ──────────────────────────────────────────────────────────
+function tickClock() {
+  document.getElementById('clockFoot').textContent = new Date().toLocaleString('en-ZA', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+setInterval(tickClock, 30000);
 
-(async function init(){
+(async function init() {
   tickClock();
   await initFirebase();
   await refreshAll();
-  setTab('dashboard');
+  const savedTab = sessionStorage.getItem('mg_ui_tab');
+  if (savedTab && document.querySelector(`[data-tab="${savedTab}"]`)) {
+    setTab(savedTab);
+  } else {
+    setTab('dashboard');
+  }
 })();
 </script>
 </body>
