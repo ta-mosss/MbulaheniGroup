@@ -440,6 +440,23 @@ label { display: block; font-size: 11px; color: var(--text-dim); margin-bottom: 
 .cal-cell.today { border-color: var(--teal-dim); background: rgba(45,212,191,.06); }
 .cal-cell .d { font-family: var(--font-mono); font-size: 10px; color: var(--text-dim); margin-bottom: 3px; }
 .cal-chip { background: var(--elevated); border-radius: 4px; padding: 1px 4px; margin-bottom: 2px; font-size: 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ─── SKELETON LOADING ─── */
+.skel { background: linear-gradient(90deg, var(--elevated) 25%, var(--border) 37%, var(--elevated) 63%); background-size: 400% 100%; animation: skel-pulse 1.4s ease infinite; border-radius: 6px; }
+@keyframes skel-pulse { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
+.skel-kpi .kpi-top { width: 60%; height: 11px; }
+.skel-kpi .kpi-num { width: 45%; height: 26px; margin-top: 8px; }
+.skel-kpi .kpi-foot { width: 70%; height: 10px; margin-top: 8px; }
+.skel-row td { padding: 12px; }
+.skel-line { height: 12px; border-radius: 5px; }
+
+/* ─── FILTER BAR / SORT / BULK ─── */
+.filter-bar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
+.filter-bar select, .filter-bar input { width: auto; min-width: 130px; }
+th.sortable { cursor: pointer; user-select: none; }
+th.sortable:hover { color: var(--text); }
+th.sortable .sort-arrow { opacity: .5; margin-left: 3px; }
+.bulk-bar { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: var(--elevated); border-radius: 9px; margin-bottom: 8px; font-size: 12px; }
 </style>
 </head>
 <body>
@@ -554,6 +571,7 @@ label { display: block; font-size: 11px; color: var(--text-dim); margin-bottom: 
   <div class="modal" id="modalBody"></div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script>
 // ========================================================================
 //  MBULAHENI GROUP — CENTRAL OS v5.1 (PRODUCTION MODE)
@@ -622,7 +640,11 @@ let state = {
   mgfcJobs: [],          // mg_mgfc_jobs — real cleaning jobs for MGFC
   calMonth: new Date(),
   crmFilter: 'all',
-  crmStatusFilter: 'all'
+  crmStatusFilter: 'all',
+  isLoading: true,
+  crmSort: { col: '_createdAt', dir: 'desc' },
+  crmSelected: new Set(),
+  _listeners: []
 };
 
 // ─── UTILITY ────────────────────────────────────────────────────────
@@ -635,6 +657,10 @@ function isAdminEmail(email) { return email && ADMIN_EMAILS.includes(email.toLow
 function divisionById(id) { return state.divisions.find(d => d.id === id) || { name: id, color: '#5c6b83', short: '—', kind: 'other' }; }
 function crmTypeMeta(id) { return CRM_TYPES.find(t => t.id === id) || CRM_TYPES[0]; }
 function canWrite() { return !!(state.user && state.firebaseReady); }
+
+// Upgrade #5: Currency & locale handling — native Intl.NumberFormat
+const ZAR_FMT = new Intl.NumberFormat('en-ZA', { style: 'currency', currency: 'ZAR' });
+function fmtZAR(amount) { return ZAR_FMT.format(Number(amount) || 0); }
 
 function toast(msg) {
   let t = document.getElementById('mgToast');
@@ -738,6 +764,8 @@ async function logAudit(action, target) {
 
 // ─── REFRESH ────────────────────────────────────────────────────────
 async function refreshAll() {
+  state.isLoading = true;
+  render();
   try {
     const [crm, freelancers, activity, tasks, employees, assets, approvals, fleet, procurement, knowledge, audit, tickets, mgfcJobs] = await Promise.all([
       Store.list('mg_crm'), Store.list('mg_freelancers'), Store.list('mg_activity'), Store.list('mg_tasks'),
@@ -753,11 +781,95 @@ async function refreshAll() {
   } catch (e) {
     console.warn('Refresh failed:', e);
   }
+  state.isLoading = false;
   computeDashboardStats();
   computeHealthScores();
   updateBadges();
   updateSidebarAuth();
   updateNotifs();
+  render();
+}
+
+// ─── UPGRADE #1: REAL-TIME LISTENERS (onSnapshot) ─────────────────
+// Instead of a one-shot Store.list() fetch, we attach live Firestore
+// listeners to the collections that matter across the whole app. Any
+// change made by another admin (on another device/tab) streams straight
+// into `state` and triggers a re-render — no manual refresh needed.
+// Listeners are detached in detachAllListeners() (called on sign-out /
+// before re-attaching) to avoid leaking snapshot subscriptions.
+const LIVE_COLLECTIONS = {
+  crm: 'mg_crm', freelancers: 'mg_freelancers', activity: 'mg_activity', tasks: 'mg_tasks',
+  employees: 'mg_employees', assets: 'mg_assets', approvals: 'mg_approvals', fleet: 'mg_fleet',
+  procurement: 'mg_procurement', knowledge: 'mg_knowledge', tickets: 'mg_tickets', mgfcJobs: 'mg_mgfc_jobs'
+};
+
+function detachAllListeners() {
+  state._listeners.forEach(unsub => { try { unsub(); } catch (e) {} });
+  state._listeners = [];
+}
+
+function attachLiveListeners() {
+  if (!state.firebaseReady || !state.db) return;
+  detachAllListeners();
+  state.isLoading = true;
+  render();
+  let firstLoadPending = new Set(Object.keys(LIVE_COLLECTIONS));
+
+  Object.entries(LIVE_COLLECTIONS).forEach(([stateKey, coll]) => {
+    const unsub = state.db.collection(coll).onSnapshot(snap => {
+      state[stateKey] = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      if (stateKey === 'audit') state.audit = state.audit.sort((a,b) => (b.timestamp||0) - (a.timestamp||0));
+      firstLoadPending.delete(stateKey);
+      if (firstLoadPending.size === 0) state.isLoading = false;
+      computeDashboardStats();
+      computeHealthScores();
+      updateBadges();
+      updateNotifs();
+      render();
+    }, err => {
+      console.warn(`[Listener] ${coll} failed:`, err);
+      firstLoadPending.delete(stateKey);
+      if (firstLoadPending.size === 0) state.isLoading = false;
+    });
+    state._listeners.push(unsub);
+  });
+
+  // mg_audit listener kept separate since it needs sort-by-timestamp + dashboard/audit views
+  const auditUnsub = state.db.collection('mg_audit').onSnapshot(snap => {
+    state.audit = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => (b.timestamp||0) - (a.timestamp||0));
+    render();
+  }, err => console.warn('[Listener] mg_audit failed:', err));
+  state._listeners.push(auditUnsub);
+}
+
+// ─── UPGRADE #3: ATOMIC AUTO-INCREMENTING REFERENCE NUMBERS ───────
+// Prevents two admins creating a record at the exact same moment from
+// getting the same Reference ID. A counter document per (division, type)
+// lives in mg_counters and is incremented inside a Firestore transaction —
+// if two writes collide, Firestore automatically retries the loser.
+async function nextRefNumber(division, typeId) {
+  if (!state.firebaseReady || !state.db) throw new Error('Not connected to Firestore');
+  const divMeta = divisionById(division);
+  const typeMeta = crmTypeMeta(typeId);
+  const prefix = `${(divMeta.short || division).toUpperCase()}-${(typeMeta.id || 'REC').slice(0,1).toUpperCase()}`;
+  const year = new Date().getFullYear();
+  const counterId = `${division}_${typeId}_${year}`;
+  const counterRef = state.db.collection('mg_counters').doc(counterId);
+  const next = await state.db.runTransaction(async (tx) => {
+    const snap = await tx.get(counterRef);
+    const current = snap.exists ? (snap.data().value || 0) : 0;
+    const updated = current + 1;
+    tx.set(counterRef, { value: updated, updatedAt: Date.now() }, { merge: true });
+    return updated;
+  });
+  return `${prefix}-${year}-${String(next).padStart(3, '0')}`;
+}
+
+// Ref uniqueness guard for upgrade #8 — checked before create, in addition
+// to the atomic counter (belt-and-braces if a ref was typed manually).
+function isDuplicateRef(ref, excludeId) {
+  if (!ref) return false;
+  return state.crm.some(r => r.id !== excludeId && (r.ref || '').trim().toLowerCase() === ref.trim().toLowerCase());
 }
 
 // ─── REAL DASHBOARD STATS (computed from live collections, no hardcoding) ─
@@ -792,7 +904,7 @@ function computeDashboardStats() {
 }
 
 function computeHealthScores() {
-  const s = state.stats;
+  const s = state.stats || {};
   state.health = {};
   state.divisions.forEach(d => {
     const dStats = s[d.id] || {};
@@ -836,7 +948,7 @@ function updateSidebarAuth() {
 function updateNotifs() {
   const notifs = [];
   state.crm.filter(r => r.type === 'invoice' && r.status === 'Overdue').slice(0, 5).forEach(r => {
-    notifs.push({ id: 'inv_' + r.id, read: false, type: 'alert', icon: '🟠', title: 'Invoice Overdue', detail: `${r.ref || r.client || 'Invoice'} — R${Number(r.amount||0).toLocaleString()}`, time: fmtDate(r._createdAt) });
+    notifs.push({ id: 'inv_' + r.id, read: false, type: 'alert', icon: '🟠', title: 'Invoice Overdue', detail: `${r.ref || r.client || 'Invoice'} — ${fmtZAR(r.amount||0)}`, time: fmtDate(r._createdAt) });
   });
   state.tickets.filter(t => (t.priority||'').toLowerCase() === 'critical' && !['resolved','closed'].includes((t.status||'').toLowerCase())).slice(0, 5).forEach(t => {
     notifs.push({ id: 'tix_' + t.id, read: false, type: 'alert', icon: '🔴', title: 'Critical Ticket', detail: t.title || t.ref || 'Open ticket', time: fmtDate(t._createdAt) });
@@ -922,8 +1034,7 @@ async function initFirebase() {
       state.user = user;
       state.isAdmin = user ? isAdminEmail(user.email) : false;
       updateSidebarAuth();
-      if (user) { setModeUI(true); state.firebaseReady = true; await refreshAll(); if (state.tab) render(); }
-      else { if (state.db) { setModeUI(true); state.firebaseReady = true; await refreshAll(); if (state.tab) render(); } }
+      if (state.db) { setModeUI(true); state.firebaseReady = true; attachLiveListeners(); }
     });
     await state.db.collection('mg_divisions').limit(1).get();
     setModeUI(true); state.firebaseReady = true; return true;
@@ -973,6 +1084,12 @@ function setTab(tab) {
 document.querySelectorAll('.nav-item').forEach(n => n.addEventListener('click', () => setTab(n.dataset.tab)));
 document.getElementById('menuToggle').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
 
+// ─── UPGRADE #2: SKELETON LOADING HELPERS ─────────────────────────
+function skelKpiCard() { return `<div class="card kpi railed skel-kpi"><div class="skel kpi-top"></div><div class="skel kpi-num"></div><div class="skel kpi-foot"></div></div>`; }
+function skelTableRows(cols, rows) {
+  return Array.from({ length: rows }, () => `<tr class="skel-row">${Array.from({ length: cols }, () => `<td><div class="skel skel-line" style="width:${40+Math.random()*50}%"></div></td>`).join('')}</tr>`).join('');
+}
+
 function render() {
   const v = document.getElementById('view');
   const ta = document.getElementById('topActions');
@@ -1004,6 +1121,15 @@ function render() {
 
 // ─── COMMAND CENTER DASHBOARD (real computed numbers) ─────────────
 function renderDashboard(v, ta) {
+  if (state.isLoading) {
+    v.innerHTML = `
+      <div class="greeting-hero"><div><div class="skel" style="width:140px;height:11px;"></div><div class="skel" style="width:280px;height:22px;margin-top:8px;"></div></div></div>
+      <div class="grid cols-4">${Array.from({length:8}).map(skelKpiCard).join('')}</div>
+      <div class="section-title"><h2>📋 Today's Priorities</h2></div>
+      <div class="card"><div class="skel" style="height:60px;"></div></div>
+    `;
+    return;
+  }
   const s = state.stats;
   const citm = s.citm || { openTickets: 0, critical: 0, slaBreaches: 0, revenue: 0, profit: 0 };
   const mgfc = s.mgfc || { jobsToday: 0, sitesActive: 0, staffDeployed: 0, openIssues: 0, revenue: 0, profit: 0 };
@@ -1033,12 +1159,12 @@ function renderDashboard(v, ta) {
     <div class="grid cols-4">
       <div class="card kpi railed" style="--rail:var(--green)">
         <div class="kpi-top">Paid Revenue (all time)</div>
-        <div class="kpi-num">R${totalRevenue.toLocaleString()}</div>
+        <div class="kpi-num">${fmtZAR(totalRevenue)}</div>
         <div class="kpi-foot">${totalRevenue ? 'From paid CRM invoices' : 'No paid invoices logged yet'}</div>
       </div>
       <div class="card kpi railed" style="--rail:var(--blue)">
         <div class="kpi-top">Est. Profit</div>
-        <div class="kpi-num">R${totalProfit.toLocaleString()}</div>
+        <div class="kpi-num">${fmtZAR(totalProfit)}</div>
         <div class="kpi-foot">${totalRevenue ? 'Modelled at division margin' : '—'}</div>
       </div>
       <div class="card kpi railed" style="--rail:var(--red)">
@@ -1054,7 +1180,7 @@ function renderDashboard(v, ta) {
       <div class="card kpi railed" style="--rail:var(--violet)">
         <div class="kpi-top">Outstanding Quotes</div>
         <div class="kpi-num">${state.crm.filter(r => r.type === 'quotation' && (r.status === 'Draft' || r.status === 'Sent')).length}</div>
-        <div class="kpi-foot">Total R${state.crm.filter(r => r.type === 'quotation').reduce((a, c) => a + Number(c.amount || 0), 0).toLocaleString()}</div>
+        <div class="kpi-foot">Total ${fmtZAR(state.crm.filter(r => r.type === 'quotation').reduce((a, c) => a + Number(c.amount || 0), 0))}</div>
       </div>
       <div class="card kpi railed" style="--rail:var(--teal)">
         <div class="kpi-top">Staff On Record</div>
@@ -1222,34 +1348,145 @@ function renderAutomation(v, ta) {
 }
 
 // ─── CRM (REAL — full add/edit modal writing to mg_crm) ───────────
+// Upgrade #4: filtering + click-to-sort headers, re-rendering only <tbody>.
+// Upgrade #8: bulk-select checkboxes + Export Selected as CSV (PapaParse).
+function getFilteredSortedCrm() {
+  let rows = state.crm.slice();
+  if (state.crmFilter !== 'all') rows = rows.filter(r => r.division === state.crmFilter);
+  if (state.crmStatusFilter !== 'all') rows = rows.filter(r => (r.status || '') === state.crmStatusFilter);
+  const { col, dir } = state.crmSort;
+  rows.sort((a, b) => {
+    let av = a[col], bv = b[col];
+    if (col === 'amount') { av = Number(av) || 0; bv = Number(bv) || 0; }
+    else { av = (av ?? '').toString().toLowerCase(); bv = (bv ?? '').toString().toLowerCase(); }
+    if (av < bv) return dir === 'asc' ? -1 : 1;
+    if (av > bv) return dir === 'asc' ? 1 : -1;
+    return 0;
+  });
+  return rows;
+}
+
 function renderCRM(v, ta) {
   ta.style.display = 'flex';
   ta.innerHTML = state.user ? `<button class="btn primary sm" onclick="openCrmModal()">+ New Record</button>` : `<span style="font-size:11px;color:var(--text-faint);">Sign in to create records</span>`;
-  const rows = state.crm.slice().sort((a, b) => (b._createdAt || 0) - (a._createdAt || 0));
+
+  if (state.isLoading) {
+    v.innerHTML = `
+      <div class="section-title"><h2>👤 CRM · Customer 360</h2></div>
+      <div class="table-wrap"><div class="table-scroll"><table><thead><tr><th>Type</th><th>Client</th><th>Division</th><th>Ref</th><th>Status</th><th>Amount</th><th>Date</th><th></th></tr></thead>
+      <tbody>${skelTableRows(8, 6)}</tbody></table></div></div>
+    `;
+    return;
+  }
+
+  const allStatuses = Array.from(new Set(state.crm.map(r => r.status).filter(Boolean))).sort();
+  const rows = getFilteredSortedCrm();
+  const sortArrow = (col) => state.crmSort.col === col ? (state.crmSort.dir === 'asc' ? '▲' : '▼') : '';
+
   v.innerHTML = `
-    <div class="section-title"><h2>👤 CRM · Customer 360</h2><span class="hint">${rows.length} records</span></div>
+    <div class="section-title"><h2>👤 CRM · Customer 360</h2><span class="hint">${rows.length} of ${state.crm.length} records</span></div>
+    <div class="filter-bar">
+      <select id="crmDivFilter" onchange="state.crmFilter=this.value;renderCrmBody();">
+        <option value="all" ${state.crmFilter==='all'?'selected':''}>All divisions</option>
+        ${state.divisions.map(d => `<option value="${d.id}" ${state.crmFilter===d.id?'selected':''}>${esc(d.name)}</option>`).join('')}
+      </select>
+      <select id="crmStatusFilterSel" onchange="state.crmStatusFilter=this.value;renderCrmBody();">
+        <option value="all" ${state.crmStatusFilter==='all'?'selected':''}>All statuses</option>
+        ${allStatuses.map(s => `<option value="${esc(s)}" ${state.crmStatusFilter===s?'selected':''}>${esc(s)}</option>`).join('')}
+      </select>
+      <button class="btn sm ghost" onclick="state.crmFilter='all';state.crmStatusFilter='all';renderCrmBody();">Clear filters</button>
+      <button class="btn sm" style="margin-left:auto;" onclick="exportSelectedCrmCsv()">⬇ Export Selected as CSV</button>
+    </div>
+    <div id="crmBulkBar"></div>
     <div class="table-wrap">
       <div class="table-scroll">
-        <table><thead><tr><th>Type</th><th>Client</th><th>Division</th><th>Ref</th><th>Status</th><th>Amount</th><th>Date</th><th></th></tr></thead>
-          <tbody>
-            ${rows.length ? rows.map(r => `
-              <tr>
-                <td>${crmTypeMeta(r.type).label}</td>
-                <td class="cell-main">${esc(r.client || '—')}</td>
-                <td><span class="dtag" style="--dc:${divisionById(r.division).color}"><span class="dot"></span>${esc(divisionById(r.division).short)}</span></td>
-                <td style="font-family:var(--font-mono);font-size:11px;color:var(--text-dim);">${esc(r.ref || '—')}</td>
-                <td><span class="badge ${statusBadgeClass(r.status)}">${esc(r.status || '—')}</span></td>
-                <td>${r.amount ? 'R ' + Number(r.amount).toLocaleString() : '—'}</td>
-                <td style="font-size:11px;color:var(--text-faint);">${fmtDate(r._createdAt)}</td>
-                <td><button class="icon-btn" onclick="openCrmModal('${r.id}')">✎</button></td>
-              </tr>
-            `).join('') : '<tr><td colspan="8" class="table-empty">No CRM records yet. Click "+ New Record" to log an enquiry, quote, invoice or complaint.</td></tr>'}
-          </tbody>
+        <table>
+          <thead>
+            <tr>
+              <th><input type="checkbox" id="crmSelectAll" onchange="toggleSelectAllCrm(this.checked)"></th>
+              <th class="sortable" onclick="setCrmSort('type')">Type <span class="sort-arrow">${sortArrow('type')}</span></th>
+              <th class="sortable" onclick="setCrmSort('client')">Client <span class="sort-arrow">${sortArrow('client')}</span></th>
+              <th>Division</th>
+              <th class="sortable" onclick="setCrmSort('ref')">Ref <span class="sort-arrow">${sortArrow('ref')}</span></th>
+              <th class="sortable" onclick="setCrmSort('status')">Status <span class="sort-arrow">${sortArrow('status')}</span></th>
+              <th class="sortable" onclick="setCrmSort('amount')">Amount <span class="sort-arrow">${sortArrow('amount')}</span></th>
+              <th class="sortable" onclick="setCrmSort('_createdAt')">Date <span class="sort-arrow">${sortArrow('_createdAt')}</span></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="crmTbody"></tbody>
         </table>
       </div>
     </div>
   `;
+  renderCrmBody();
 }
+
+function setCrmSort(col) {
+  if (state.crmSort.col === col) state.crmSort.dir = state.crmSort.dir === 'asc' ? 'desc' : 'asc';
+  else state.crmSort = { col, dir: 'asc' };
+  render(); // header arrows need a full re-render of the CRM view
+}
+
+function renderCrmBody() {
+  const tbody = document.getElementById('crmTbody');
+  const bulkBar = document.getElementById('crmBulkBar');
+  if (!tbody) return;
+  const rows = getFilteredSortedCrm();
+  const visibleIds = new Set(rows.map(r => r.id));
+  // prune selection to only visible rows still present
+  state.crmSelected = new Set(Array.from(state.crmSelected).filter(id => visibleIds.has(id)));
+
+  tbody.innerHTML = rows.length ? rows.map(r => `
+    <tr>
+      <td><input type="checkbox" class="crm-row-check" data-id="${r.id}" ${state.crmSelected.has(r.id)?'checked':''} onchange="toggleCrmRow('${r.id}', this.checked)"></td>
+      <td>${crmTypeMeta(r.type).label}</td>
+      <td class="cell-main">${esc(r.client || '—')}</td>
+      <td><span class="dtag" style="--dc:${divisionById(r.division).color}"><span class="dot"></span>${esc(divisionById(r.division).short)}</span></td>
+      <td style="font-family:var(--font-mono);font-size:11px;color:var(--text-dim);">${esc(r.ref || '—')}</td>
+      <td><span class="badge ${statusBadgeClass(r.status)}">${esc(r.status || '—')}</span></td>
+      <td>${r.amount ? fmtZAR(r.amount) : '—'}</td>
+      <td style="font-size:11px;color:var(--text-faint);">${fmtDate(r._createdAt)}</td>
+      <td><button class="icon-btn" onclick="openCrmModal('${r.id}')">✎</button></td>
+    </tr>
+  `).join('') : '<tr><td colspan="9" class="table-empty">No CRM records match these filters.</td></tr>';
+
+  const selCount = state.crmSelected.size;
+  bulkBar.innerHTML = selCount ? `<div class="bulk-bar"><span>${selCount} selected</span><button class="btn sm ghost" onclick="state.crmSelected.clear();renderCrmBody();">Clear selection</button><button class="btn sm" style="margin-left:auto;" onclick="exportSelectedCrmCsv()">⬇ Export Selected as CSV</button></div>` : '';
+  const selectAllBox = document.getElementById('crmSelectAll');
+  if (selectAllBox) selectAllBox.checked = rows.length > 0 && rows.every(r => state.crmSelected.has(r.id));
+}
+
+function toggleCrmRow(id, checked) {
+  if (checked) state.crmSelected.add(id); else state.crmSelected.delete(id);
+  renderCrmBody();
+}
+function toggleSelectAllCrm(checked) {
+  const rows = getFilteredSortedCrm();
+  if (checked) rows.forEach(r => state.crmSelected.add(r.id));
+  else rows.forEach(r => state.crmSelected.delete(r.id));
+  renderCrmBody();
+}
+function exportSelectedCrmCsv() {
+  const chosen = state.crmSelected.size ? state.crm.filter(r => state.crmSelected.has(r.id)) : getFilteredSortedCrm();
+  if (!chosen.length) { toast('Nothing to export'); return; }
+  const rows = chosen.map(r => ({
+    Type: crmTypeMeta(r.type).label, Client: r.client || '', Division: divisionById(r.division).name,
+    Ref: r.ref || '', Status: r.status || '', Amount: Number(r.amount || 0), Email: r.email || '', Phone: r.phone || '',
+    Date: fmtDate(r._createdAt), Notes: r.notes || ''
+  }));
+  const csv = (typeof Papa !== 'undefined') ? Papa.unparse(rows) : csvFallback(rows);
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `mg-crm-export-${todayISO()}.csv`; a.click();
+  toast(`Exported ${chosen.length} record(s)`);
+}
+function csvFallback(rows) {
+  if (!rows.length) return '';
+  const headers = Object.keys(rows[0]);
+  const esc2 = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  return [headers.join(','), ...rows.map(r => headers.map(h => esc2(r[h])).join(','))].join('\n');
+}
+
 function statusBadgeClass(s) {
   const st = (s || '').toLowerCase();
   if (['won','paid','resolved','closed','accepted','done'].includes(st)) return 'b-done';
@@ -1281,7 +1518,7 @@ function openCrmModal(id) {
       <div class="field"><label>Phone</label><input id="c_phone" value="${esc(r.phone)}" placeholder="+27 ..."></div>
     </div>
     <div class="field-row">
-      <div class="field"><label>Reference</label><input id="c_ref" value="${esc(r.ref)}" placeholder="e.g. CITM-Q-2026-016"></div>
+      <div class="field"><label>Reference ${editing ? '' : '<span style="font-weight:400;color:var(--text-faint);">(leave blank to auto-generate)</span>'}</label><input id="c_ref" value="${esc(r.ref)}" placeholder="e.g. CITM-Q-2026-016"></div>
       <div class="field"><label>Amount (R)</label><input id="c_amount" type="number" value="${esc(r.amount)}" placeholder="0.00"></div>
     </div>
     <div class="field"><label>Status</label>
@@ -1300,6 +1537,7 @@ function openCrmModal(id) {
     document.getElementById('c_status').innerHTML = meta.statuses.map(st => `<option value="${st}">${st}</option>`).join('');
   });
   document.getElementById('saveCrmBtn').onclick = async () => {
+    const saveBtn = document.getElementById('saveCrmBtn');
     const data = {
       type: document.getElementById('c_type').value,
       division: document.getElementById('c_division').value,
@@ -1312,16 +1550,31 @@ function openCrmModal(id) {
       notes: document.getElementById('c_notes').value.trim()
     };
     if (!data.client) { toast('Client name is required'); return; }
+    // Upgrade #8: duplicate ref guard — throws a toast immediately instead of silently saving a clash
+    if (data.ref && isDuplicateRef(data.ref, editing ? id : null)) {
+      toast(`⚠ Reference "${data.ref}" already exists — choose a different one`);
+      return;
+    }
+    saveBtn.disabled = true;
     try {
-      if (editing) { await Store.update('mg_crm', id, data); toast('✅ Record saved'); }
-      else { await Store.add('mg_crm', data); toast('✅ Record created'); }
-      await refreshAll(); closeModal(); render();
+      if (editing) {
+        await Store.update('mg_crm', id, data); toast('✅ Record saved');
+      } else {
+        // Upgrade #3: auto-generate a collision-safe ref via Firestore transaction if none was typed
+        if (!data.ref) {
+          try { data.ref = await nextRefNumber(data.division, data.type); }
+          catch (e) { console.warn('Ref auto-generation failed, saving without one:', e); }
+        }
+        await Store.add('mg_crm', data); toast('✅ Record created' + (data.ref ? ` — ${data.ref}` : ''));
+      }
+      closeModal();
     } catch (e) { toast('Error: ' + e.message); }
+    finally { saveBtn.disabled = false; }
   };
   if (editing) {
     document.getElementById('deleteCrmBtn').onclick = async () => {
       if (!confirm('Delete this CRM record permanently?')) return;
-      try { await Store.remove('mg_crm', id); await refreshAll(); closeModal(); render(); toast('Deleted'); }
+      try { await Store.remove('mg_crm', id); closeModal(); toast('Deleted'); }
       catch (e) { toast('Error: ' + e.message); }
     };
   }
@@ -1341,7 +1594,7 @@ function renderApprovals(v, ta) {
         <div class="approval-row">
           <div class="ap-main">
             <div class="ap-title">${esc(a.type)} — ${esc(a.requester)}</div>
-            <div class="ap-sub">${a.amount ? 'R ' + Number(a.amount).toLocaleString() : '—'} · ${fmtDate(a._createdAt)}</div>
+            <div class="ap-sub">${a.amount ? fmtZAR(a.amount) : '—'} · ${fmtDate(a._createdAt)}</div>
           </div>
           <div class="ap-actions">
             <button class="btn success sm" onclick="approveAction('${a.id}')">✓</button>
@@ -1370,16 +1623,16 @@ function openApprovalModal(id, presetType) {
   document.getElementById('saveApBtn').onclick = async () => {
     const data = { type: document.getElementById('ap_type').value, requester: document.getElementById('ap_requester').value.trim(), amount: Number(document.getElementById('ap_amount').value) || null, notes: document.getElementById('ap_notes').value.trim(), status: 'Pending' };
     if (!data.requester) { toast('Requester name is required'); return; }
-    try { await Store.add('mg_approvals', data); await refreshAll(); closeModal(); render(); toast('Submitted'); }
+    try { await Store.add('mg_approvals', data); closeModal(); toast('Submitted'); }
     catch (e) { toast('Error: ' + e.message); }
   };
 }
 async function approveAction(id) {
-  try { await Store.update('mg_approvals', id, { status: 'Approved' }); await refreshAll(); render(); toast('✅ Approved'); }
+  try { await Store.update('mg_approvals', id, { status: 'Approved' }); toast('✅ Approved'); }
   catch (e) { toast('Error: ' + e.message); }
 }
 async function rejectAction(id) {
-  try { await Store.update('mg_approvals', id, { status: 'Rejected' }); await refreshAll(); render(); toast('❌ Rejected'); }
+  try { await Store.update('mg_approvals', id, { status: 'Rejected' }); toast('❌ Rejected'); }
   catch (e) { toast('Error: ' + e.message); }
 }
 
@@ -1424,13 +1677,13 @@ function openStaffModal(id) {
       const data = { name: document.getElementById('f_name').value.trim(), role: document.getElementById('f_role').value.trim(), division: document.getElementById('f_division').value, phone: document.getElementById('f_phone').value.trim(), status: document.getElementById('f_status').value };
       if (!data.name) { toast('Name is required'); return; }
       if (editing) { await Store.update('mg_employees', id, data); } else { await Store.add('mg_employees', data); }
-      await refreshAll(); closeModal(); render(); toast(editing ? 'Saved' : 'Added');
+      closeModal(); toast(editing ? 'Saved' : 'Added');
     } catch (e) { toast('Error: ' + e.message); }
   };
   if (editing) {
     document.getElementById('delStaffBtn').onclick = async () => {
       if (!confirm('Remove this employee record?')) return;
-      try { await Store.remove('mg_employees', id); await refreshAll(); closeModal(); render(); toast('Removed'); }
+      try { await Store.remove('mg_employees', id); closeModal(); toast('Removed'); }
       catch (e) { toast('Error: ' + e.message); }
     };
   }
@@ -1473,12 +1726,12 @@ function openFreelancerModal(id) {
     if (!data.name) { toast('Name is required'); return; }
     try {
       if (editing) await Store.update('mg_freelancers', id, data); else await Store.add('mg_freelancers', data);
-      await refreshAll(); closeModal(); render(); toast(editing ? 'Saved' : 'Added');
+      closeModal(); toast(editing ? 'Saved' : 'Added');
     } catch (e) { toast('Error: ' + e.message); }
   };
   if (editing) document.getElementById('delFlBtn').onclick = async () => {
     if (!confirm('Delete this freelancer?')) return;
-    try { await Store.remove('mg_freelancers', id); await refreshAll(); closeModal(); render(); toast('Deleted'); } catch (e) { toast('Error: ' + e.message); }
+    try { await Store.remove('mg_freelancers', id); closeModal(); toast('Deleted'); } catch (e) { toast('Error: ' + e.message); }
   };
 }
 function openActivityModal() {
@@ -1494,7 +1747,7 @@ function openActivityModal() {
   `);
   document.getElementById('saveActBtn').onclick = async () => {
     const data = { freelancerId: document.getElementById('act_fl').value, date: document.getElementById('act_date').value, actType: document.getElementById('act_type').value, client: document.getElementById('act_client').value.trim(), notes: document.getElementById('act_notes').value.trim(), status: 'Logged' };
-    try { await Store.add('mg_activity', data); await refreshAll(); closeModal(); render(); toast('Activity logged'); }
+    try { await Store.add('mg_activity', data); closeModal(); toast('Activity logged'); }
     catch (e) { toast('Error: ' + e.message); }
   };
 }
@@ -1533,12 +1786,12 @@ function openFleetModal(id) {
   document.getElementById('saveFvBtn').onclick = async () => {
     const data = { reg: document.getElementById('fv_reg').value.trim(), status: document.getElementById('fv_status').value, make: document.getElementById('fv_make').value.trim(), model: document.getElementById('fv_model').value.trim(), driver: document.getElementById('fv_driver').value.trim(), mileage: Number(document.getElementById('fv_mileage').value)||0, fuel: Number(document.getElementById('fv_fuel').value)||0 };
     if (!data.reg) { toast('Registration is required'); return; }
-    try { if (editing) await Store.update('mg_fleet', id, data); else await Store.add('mg_fleet', data); await refreshAll(); closeModal(); render(); toast(editing?'Saved':'Added'); }
+    try { if (editing) await Store.update('mg_fleet', id, data); else await Store.add('mg_fleet', data); closeModal(); toast(editing?'Saved':'Added'); }
     catch (e) { toast('Error: ' + e.message); }
   };
   if (editing) document.getElementById('delFvBtn').onclick = async () => {
     if (!confirm('Delete this vehicle record?')) return;
-    try { await Store.remove('mg_fleet', id); await refreshAll(); closeModal(); render(); toast('Deleted'); } catch (e) { toast('Error: ' + e.message); }
+    try { await Store.remove('mg_fleet', id); closeModal(); toast('Deleted'); } catch (e) { toast('Error: ' + e.message); }
   };
 }
 
@@ -1552,10 +1805,10 @@ function renderFinance(v, ta) {
   v.innerHTML = `
     <div class="section-title"><h2>💰 Finance Centre</h2><span class="hint">Computed from mg_crm invoice records</span></div>
     <div class="grid cols-4">
-      <div class="card kpi railed" style="--rail:var(--green)"><div class="kpi-top">Revenue (Paid)</div><div class="kpi-num">R${totalRevenue.toLocaleString()}</div><div class="kpi-foot">${invoices.length ? invoices.filter(r=>r.status==='Paid').length + ' paid invoices' : 'No invoices logged yet'}</div></div>
-      <div class="card kpi railed" style="--rail:var(--red)"><div class="kpi-top">Total Invoiced</div><div class="kpi-num">R${totalInvoiced.toLocaleString()}</div><div class="kpi-foot">${invoices.length} invoices total</div></div>
-      <div class="card kpi railed" style="--rail:var(--amber)"><div class="kpi-top">Outstanding</div><div class="kpi-num" style="color:var(--amber)">R${outstanding.toLocaleString()}</div><div class="kpi-foot">${unpaidCount} unpaid</div></div>
-      <div class="card kpi railed" style="--rail:var(--blue)"><div class="kpi-top">Approved spend (approvals)</div><div class="kpi-num">R${state.approvals.filter(a=>a.status==='Approved').reduce((s,a)=>s+Number(a.amount||0),0).toLocaleString()}</div><div class="kpi-foot">${state.approvals.filter(a=>a.status==='Approved').length} approved</div></div>
+      <div class="card kpi railed" style="--rail:var(--green)"><div class="kpi-top">Revenue (Paid)</div><div class="kpi-num">${fmtZAR(totalRevenue)}</div><div class="kpi-foot">${invoices.length ? invoices.filter(r=>r.status==='Paid').length + ' paid invoices' : 'No invoices logged yet'}</div></div>
+      <div class="card kpi railed" style="--rail:var(--red)"><div class="kpi-top">Total Invoiced</div><div class="kpi-num">${fmtZAR(totalInvoiced)}</div><div class="kpi-foot">${invoices.length} invoices total</div></div>
+      <div class="card kpi railed" style="--rail:var(--amber)"><div class="kpi-top">Outstanding</div><div class="kpi-num" style="color:var(--amber)">${fmtZAR(outstanding)}</div><div class="kpi-foot">${unpaidCount} unpaid</div></div>
+      <div class="card kpi railed" style="--rail:var(--blue)"><div class="kpi-top">Approved spend (approvals)</div><div class="kpi-num">${fmtZAR(state.approvals.filter(a=>a.status==='Approved').reduce((s,a)=>s+Number(a.amount||0),0))}</div><div class="kpi-foot">${state.approvals.filter(a=>a.status==='Approved').length} approved</div></div>
     </div>
     <div class="card"><h3 style="font-size:13px;font-weight:700;margin-bottom:8px;">📈 Cashflow</h3><div style="height:80px;background:var(--elevated);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--text-faint);font-size:12px;">Chart visualization not wired up yet — plug Chart.js against mg_crm invoice history here.</div></div>
   `;
@@ -1593,12 +1846,12 @@ function openAssetModal(id) {
   document.getElementById('saveAsBtn').onclick = async () => {
     const data = { name: document.getElementById('as_name').value.trim(), serial: document.getElementById('as_serial').value.trim(), status: document.getElementById('as_status').value, owner: document.getElementById('as_owner').value.trim(), location: document.getElementById('as_location').value.trim() };
     if (!data.name) { toast('Asset name is required'); return; }
-    try { if (editing) await Store.update('mg_assets', id, data); else await Store.add('mg_assets', data); await refreshAll(); closeModal(); render(); toast(editing?'Saved':'Added'); }
+    try { if (editing) await Store.update('mg_assets', id, data); else await Store.add('mg_assets', data); closeModal(); toast(editing?'Saved':'Added'); }
     catch (e) { toast('Error: ' + e.message); }
   };
   if (editing) document.getElementById('delAsBtn').onclick = async () => {
     if (!confirm('Delete this asset?')) return;
-    try { await Store.remove('mg_assets', id); await refreshAll(); closeModal(); render(); toast('Deleted'); } catch (e) { toast('Error: ' + e.message); }
+    try { await Store.remove('mg_assets', id); closeModal(); toast('Deleted'); } catch (e) { toast('Error: ' + e.message); }
   };
 }
 
@@ -1608,7 +1861,7 @@ function renderProcurement(v, ta) {
     <div class="section-title"><h2>📦 Procurement</h2><span class="hint">${state.procurement.length} PO records</span></div>
     <div class="card" style="border-left:3px solid var(--amber);margin-bottom:12px;"><div style="font-size:11.5px;color:var(--amber);">This module reads mg_procurement but has no create/edit form yet — v1.2 roadmap item. Log records directly in Firestore or ask for the form to be built next.</div></div>
     <div class="table-wrap"><div class="table-scroll"><table><thead><tr><th>PO Ref</th><th>Supplier</th><th>Status</th><th>Amount</th></tr></thead>
-      <tbody>${state.procurement.length ? state.procurement.map(p => `<tr><td>${esc(p.ref||'—')}</td><td>${esc(p.supplier||'—')}</td><td><span class="badge b-neutral">${esc(p.status||'—')}</span></td><td>${p.amount?'R '+Number(p.amount).toLocaleString():'—'}</td></tr>`).join('') : '<tr><td colspan="4" class="table-empty">No procurement records in mg_procurement yet.</td></tr>'}</tbody>
+      <tbody>${state.procurement.length ? state.procurement.map(p => `<tr><td>${esc(p.ref||'—')}</td><td>${esc(p.supplier||'—')}</td><td><span class="badge b-neutral">${esc(p.status||'—')}</span></td><td>${p.amount?fmtZAR(p.amount):'—'}</td></tr>`).join('') : '<tr><td colspan="4" class="table-empty">No procurement records in mg_procurement yet.</td></tr>'}</tbody>
     </table></div></div>
   `;
 }
@@ -1768,16 +2021,17 @@ function renderSettings(v, ta) {
       <h3>🛡️ Security Rules — Not Yet Deployed</h3>
       <div class="desc">The admin allowlist above lives in this JavaScript file, which anyone can read or bypass via the browser console. It only controls what buttons appear — it does <strong>not</strong> protect your Firestore data. Real protection requires Firestore Security Rules deployed on the <code>test-bot-49f99</code> project. A starting rule set has been provided alongside this file (firestore.rules) — it needs to be reviewed and deployed via the Firebase Console or CLI (<code>firebase deploy --only firestore:rules</code>) before this goes into real production use with sensitive data.</div>
     </div>
-    <div class="settings-block"><h3>📡 System Status</h3><div class="desc">${state.firebaseReady ? '✅ Connected to Firestore (Production Mode)' : '⚠️ Not connected — check network/config'}</div></div>
+    <div class="settings-block"><h3>📡 System Status</h3><div class="desc">${state.firebaseReady ? '✅ Connected to Firestore (Production Mode) · Real-time listeners active' : '⚠️ Not connected — check network/config'}</div></div>
     <div class="settings-block"><h3>💾 Data</h3><button class="btn sm" onclick="exportData()">Export JSON</button></div>
-    <div class="settings-block"><h3>🏗️ Multi-Tenant Engine</h3><div class="desc">${state.divisions.length} modules loaded. Division management UI is a v1.2 roadmap item — new divisions currently need to be added to the DIVISIONS constant in code.</div></div>
+    <div class="settings-block"><h3>🏗️ Multi-Tenant Engine</h3><div class="desc">${state.divisions.length} modules loaded. Division management UI is a v1.2 roadmap item — new divisions currently need to be added to the DIVISIONS constant in code.<br><br>Note on true multi-tenant isolation: a <code>tenantId</code> field and Firestore Security Rules keyed off a custom auth claim (<code>request.auth.token.tenantId</code>) are needed to enforce this server-side — that claim can only be set from a trusted backend (Cloud Function / Admin SDK), not from this browser-only file.</div></div>
     <div class="settings-block"><h3>🚧 Known Placeholders (v1.1)</h3><div class="desc">
       • <strong>MG AI Assistant</strong> — demo replies only, no backend LLM call from this static file.<br>
       • <strong>Reports Centre</strong> — no PDF generation wired up.<br>
       • <strong>Security Centre</strong> — no live feed from MS Secure Score / firewall / backups.<br>
       • <strong>Automation</strong> — visual reference of the intended workflow chain; no Cloud Functions triggering it yet.<br>
       • <strong>Procurement</strong> — reads mg_procurement but has no create/edit form yet.<br>
-      • <strong>Division Hub "Add division"</strong> — not yet implemented.
+      • <strong>Division Hub "Add division"</strong> — not yet implemented.<br>
+      • <strong>True multi-tenant isolation</strong> — needs a backend to assign/enforce tenantId claims (see above).
     </div></div>
   `;
 }
@@ -1795,8 +2049,8 @@ setInterval(tickClock, 30000);
 
 (async function init() {
   tickClock();
+  render(); // paint skeletons immediately, before Firebase responds
   await initFirebase();
-  await refreshAll();
   const savedTab = sessionStorage.getItem('mg_ui_tab');
   if (savedTab && document.querySelector(`[data-tab="${savedTab}"]`)) {
     setTab(savedTab);
