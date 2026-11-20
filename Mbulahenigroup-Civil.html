@@ -1,941 +1,317 @@
 <!DOCTYPE html>
 <html lang="en-ZA">
 <head>
-    <!-- Favicon / Site Icon -->
-<link rel="icon" type="image/png" sizes="32x32" href="assets/images/logo-top-recovered-recovered-1076x807.webp>
-<link rel="icon" type="image/png" sizes="16x16" href="assets/images/logo-top-recovered-recovered-1076x807.webp">
-<link rel="apple-touch-icon" href="assets/images/logo-top-recovered-recovered-1076x807.webp">
-<link rel="shortcut icon" href="assets/images/logo-top-recovered-recovered-1076x807.webp">
-  <meta charset="utf-8"/>
-  <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
-  <meta content="width=device-width, initial-scale=1, minimum-scale=1" name="viewport"/>
-  <link href="assets/images/mockup-5-128x95-1.png" rel="shortcut icon" type="image/x-icon"/>
-  <meta name="description" content="Professional civil engineering services in South Africa: infrastructure development, road construction, plant hire, and engineered construction solutions."/>
-  <meta name="keywords" content="civil engineering South Africa, infrastructure development, road construction, plant equipment hire, construction solutions, engineering services"/>
-  <meta name="author" content="Mbulaheni Group"/>
-  <meta name="robots" content="index, follow"/>
-  <meta name="geo.region" content="ZA" />
-  <meta name="geo.placename" content="South Africa" />
-  <title>Mbulaheni Group | Infrastructure & Civil Engineering Services</title>
-  
-  <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-
-  <!-- Canonical URL -->
-  <link href="https://mbulahenigroup.co.za/civil-engineering-services-south-africa.html" rel="canonical"/>
-  
-  <!-- Open Graph -->
-  <meta content="Civil Engineering Services South Africa | Infrastructure & Road Construction | Mbulaheni Group" property="og:title"/>
-  <meta content="Professional civil engineering services in South Africa: infrastructure development, road construction, plant hire, and engineered construction solutions." property="og:description"/>
-  <meta content="https://mbulahenigroup.co.za/civil-engineering-services-south-africa.html" property="og:url"/>
-  <meta content="https://mbulahenigroup.co.za/assets/images/og-image.jpg" property="og:image"/>
-  <meta content="summary_large_image" name="twitter:card"/>
-  
-  <!-- JSON-LD structured data -->
-  <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Service",
-      "serviceType": "Civil Engineering",
-      "provider": {
-        "@type": "Organization",
-        "name": "Mbulaheni Group",
-        "url": "https://mbulahenigroup.co.za",
-        "logo": "https://mbulahenigroup.co.za/assets/images/mockup-5-128x95-1.png",
-        "sameAs": [
-          "https://www.facebook.com/mbulahenigroup",
-          "https://twitter.com/mbulahenigroup",
-          "https://www.instagram.com/mbulahenigroup/"
-        ]
-      },
-      "areaServed": "South Africa",
-      "hasOfferCatalog": {
-        "@type": "OfferCatalog",
-        "name": "Civil Engineering Services",
-        "itemListElement": [
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Service",
-              "name": "Infrastructure Development and Construction",
-              "description": "Design and development of public and private infrastructure"
-            }
-          },
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Service",
-              "name": "Civil Engineered Construction Solutions",
-              "description": "Expert oversight of construction projects from start to finish"
-            }
-          },
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Service",
-              "name": "Road Works",
-              "description": "National Roads, municipal Roads and rural Roads (including gravel)"
-            }
-          }
-        ]
-      }
-    }
-  </script>
-
-  <style>
-    :root {
-      --primary: #003366;      /* Deep blue representing trust and stability */
-      --secondary: #E6C63B;    /* Gold/yellow representing earth and construction */
-      --accent: #DE2910;       /* Red from SA flag for accents */
-      --dark: #1a1a2e;         /* Dark blue for backgrounds */
-      --light: #f8f9fa;        /* Light background */
-      --text: #333333;         /* Main text color */
-      --text-light: #6c757d;   /* Lighter text */
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Roboto', sans-serif;
-      color: var(--text);
-      line-height: 1.6;
-      overflow-x: hidden;
-      background-color: #ffffff;
-    }
-
-    h1, h2, h3, h4, h5, h6 {
-      font-family: 'Montserrat', sans-serif;
-      font-weight: 700;
-      margin-bottom: 1rem;
-      color: var(--primary);
-    }
-
-    /* Navigation */
-    .navbar {
-      background-color: rgba(255, 255, 255, 0.95);
-      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
-      padding: 15px 0;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1000;
-      transition: all 0.3s ease;
-    }
-
-    .navbar.scrolled {
-      padding: 10px 0;
-      background-color: rgba(255, 255, 255, 0.98);
-    }
-
-    .navbar-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 20px;
-    }
-
-    .navbar-brand {
-      display: flex;
-      align-items: center;
-    }
-
-    .logo {
-      height: 40px;
-      margin-right: 10px;
-    }
-
-    .brand-text {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--primary);
-    }
-
-    .nav-menu {
-      display: flex;
-      list-style: none;
-    }
-
-    .nav-item {
-      margin-left: 30px;
-    }
-
-    .nav-link {
-      color: var(--primary);
-      text-decoration: none;
-      font-weight: 500;
-      position: relative;
-      padding: 5px 0;
-      transition: all 0.3s ease;
-    }
-
-    .nav-link:after {
-      content: '';
-      position: absolute;
-      width: 0;
-      height: 2px;
-      background: var(--secondary);
-      left: 0;
-      bottom: 0;
-      transition: width 0.3s ease;
-    }
-
-    .nav-link:hover:after {
-      width: 100%;
-    }
-
-    .nav-toggle {
-      display: none;
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: var(--primary);
-    }
-
-    /* Hero Section */
-    .hero {
-      background: linear-gradient(rgba(0, 51, 102, 0.8), rgba(0, 51, 102, 0.8)), url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"%3E%3Cpath fill="%23E6C63B" fill-opacity="0.1" d="M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,261.3C672,256,768,224,864,224C960,224,1056,256,1152,272C1248,288,1344,288,1392,288L1440,288L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"%3E%3C/path%3E%3C/svg%3E');
-      color: white;
-      padding: 160px 0 100px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 20px;
-      position: relative;
-      z-index: 2;
-      text-align: center;
-    }
-
-    .hero-title {
-      font-size: 3.5rem;
-      margin-bottom: 1.5rem;
-      color: white;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    }
-
-    .hero-subtitle {
-      font-size: 1.5rem;
-      margin-bottom: 2.5rem;
-      font-weight: 300;
-      max-width: 800px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .btn {
-      display: inline-block;
-      padding: 12px 30px;
-      border-radius: 30px;
-      text-decoration: none;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      cursor: pointer;
-      border: none;
-    }
-
-    .btn-primary {
-      background: var(--secondary);
-      color: var(--primary);
-    }
-
-    .btn-primary:hover {
-      background: #f2d74c;
-      transform: translateY(-3px);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-    }
-
-    .btn-outline {
-      background: transparent;
-      border: 2px solid white;
-      color: white;
-      margin-left: 15px;
-    }
-
-    .btn-outline:hover {
-      background: white;
-      color: var(--primary);
-    }
-
-    /* Section Styling */
-    section {
-      padding: 80px 0;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 20px;
-    }
-
-    .section-title {
-      text-align: center;
-      margin-bottom: 50px;
-      position: relative;
-    }
-
-    .section-title:after {
-      content: '';
-      position: absolute;
-      width: 80px;
-      height: 3px;
-      background: var(--secondary);
-      bottom: -15px;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-
-    /* Intro Section */
-    .intro {
-      background-color: var(--light);
-    }
-
-    .intro-content {
-      max-width: 900px;
-      margin: 0 auto;
-      text-align: center;
-    }
-
-    .intro-text {
-      margin-bottom: 30px;
-      font-size: 1.1rem;
-    }
-
-    .feature-list {
-      text-align: left;
-      max-width: 700px;
-      margin: 0 auto;
-    }
-
-    .feature-list li {
-      margin-bottom: 15px;
-      display: flex;
-      align-items: flex-start;
-    }
-
-    .feature-list i {
-      color: var(--secondary);
-      margin-right: 10px;
-      margin-top: 5px;
-    }
-
-    /* Services Section */
-    .services-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 30px;
-    }
-
-    .service-card {
-      background: white;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-      transition: all 0.3s ease;
-      height: 100%;
-    }
-
-    .service-card:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-    }
-
-    .service-icon {
-      height: 120px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      color: white;
-      font-size: 3rem;
-    }
-
-    .service-content {
-      padding: 25px;
-    }
-
-    .service-title {
-      font-size: 1.5rem;
-      margin-bottom: 15px;
-      color: var(--primary);
-    }
-
-    /* Why Choose Us */
-    .features {
-      background: var(--light);
-    }
-
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 30px;
-    }
-
-    .feature-item {
-      text-align: center;
-      padding: 30px 20px;
-      border-radius: 10px;
-      transition: all 0.3s ease;
-      background: white;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-    }
-
-    .feature-item:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-    }
-
-    .feature-icon {
-      font-size: 2.5rem;
-      color: var(--secondary);
-      margin-bottom: 20px;
-    }
-
-    /* CTA Section */
-    .cta {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
-      color: white;
-      text-align: center;
-    }
-
-    .cta-title {
-      color: white;
-      margin-bottom: 20px;
-    }
-
-    .cta-text {
-      margin-bottom: 30px;
-      font-size: 1.2rem;
-      max-width: 700px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    /* Contact Form */
-    .contact-form {
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-      max-width: 800px;
-      margin: 0 auto;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    .form-control {
-      width: 100%;
-      padding: 15px;
-      border-radius: 5px;
-      border: 1px solid #ddd;
-      transition: all 0.3s ease;
-    }
-
-    .form-control:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 0.2rem rgba(0, 51, 102, 0.25);
-    }
-
-    textarea.form-control {
-      min-height: 150px;
-      resize: vertical;
-    }
-
-    /* Footer */
-    footer {
-      background: var(--dark);
-      color: white;
-      padding: 60px 0 30px;
-    }
-
-    .footer-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 30px;
-      margin-bottom: 40px;
-    }
-
-    .footer-brand {
-      margin-bottom: 20px;
-    }
-
-    .footer-logo {
-      height: 40px;
-      margin-bottom: 15px;
-    }
-
-    .footer-title {
-      color: white;
-      margin-bottom: 20px;
-      position: relative;
-      padding-bottom: 10px;
-    }
-
-    .footer-title:after {
-      content: '';
-      position: absolute;
-      width: 40px;
-      height: 2px;
-      background: var(--secondary);
-      bottom: 0;
-      left: 0;
-    }
-
-    .footer-links {
-      list-style: none;
-    }
-
-    .footer-links li {
-      margin-bottom: 10px;
-    }
-
-    .footer-links a {
-      color: #ddd;
-      text-decoration: none;
-      transition: all 0.3s ease;
-    }
-
-    .footer-links a:hover {
-      color: var(--secondary);
-      padding-left: 5px;
-    }
-
-    .contact-info {
-      list-style: none;
-    }
-
-    .contact-info li {
-      margin-bottom: 15px;
-      display: flex;
-      align-items: flex-start;
-    }
-
-    .contact-info i {
-      margin-right: 10px;
-      color: var(--secondary);
-    }
-
-    .social-links {
-      display: flex;
-      margin-top: 20px;
-    }
-
-    .social-links a {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.1);
-      color: white;
-      margin-right: 10px;
-      transition: all 0.3s ease;
-    }
-
-    .social-links a:hover {
-      background: var(--secondary);
-      color: var(--primary);
-      transform: translateY(-3px);
-    }
-
-    .footer-bottom {
-      text-align: center;
-      padding-top: 30px;
-      border-top: 1px solid rgba(255,255,255,0.1);
-    }
-
-    /* Responsive Design */
-    @media (max-width: 992px) {
-      .hero-title {
-        font-size: 2.8rem;
-      }
-      
-      .hero-subtitle {
-        font-size: 1.2rem;
-      }
-      
-      .nav-menu {
-        position: fixed;
-        top: 70px;
-        right: -100%;
-        flex-direction: column;
-        background: white;
-        width: 250px;
-        height: 100vh;
-        box-shadow: -5px 0 15px rgba(0,0,0,0.1);
-        transition: all 0.3s ease;
-        padding: 40px 20px;
-      }
-      
-      .nav-menu.active {
-        right: 0;
-      }
-      
-      .nav-item {
-        margin: 15px 0;
-      }
-      
-      .nav-toggle {
-        display: block;
-      }
-    }
-
-    @media (max-width: 768px) {
-      section {
-        padding: 60px 0;
-      }
-      
-      .hero {
-        padding: 140px 0 80px;
-      }
-      
-      .hero-title {
-        font-size: 2.2rem;
-      }
-      
-      .btn {
-        display: block;
-        margin: 10px auto;
-        width: 80%;
-      }
-      
-      .btn-outline {
-        margin-left: 0;
-      }
-    }
-
-    /* Animation Classes */
-    .fade-in {
-      opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.6s ease, transform 0.6s ease;
-    }
-    
-    .fade-in.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Civil Engineering | Mbulaheni Group</title>
+<meta name="description" content="Mbulaheni Group Civil Engineering: construction, infrastructure development, project management and consulting for public and private sector clients.">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="canonical" href="https://www.mbulahenigroup.co.za/Mbulahenigroup-Civil.html">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.mbulahenigroup.co.za/Mbulahenigroup-Civil.html">
+<meta property="og:title" content="Civil Engineering | Mbulaheni Group">
+<meta property="og:description" content="Mbulaheni Group Civil Engineering: construction, infrastructure development, project management and consulting for public and private sector clients.">
+<meta property="og:image" content="https://mbulahenigroup.co.za/assets/images/og-brand.jpg">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" type="image/png" sizes="32x32" href="assets/images/MBU.png">
+<link rel="apple-touch-icon" href="assets/images/MBU.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/site.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "name": "Civil Engineering",
+  "serviceType": "Civil Engineering",
+  "url": "https://www.mbulahenigroup.co.za/Mbulahenigroup-Civil.html",
+  "areaServed": { "@type": "Country", "name": "South Africa" },
+  "provider": {
+    "@type": "Organization",
+    "name": "Mbulaheni Group",
+    "url": "https://www.mbulahenigroup.co.za/",
+    "email": "info@mbulahenigroup.co.za",
+    "telephone": "+27870931138",
+    "address": { "@type": "PostalAddress", "addressLocality": "Polokwane", "addressRegion": "Limpopo", "addressCountry": "ZA" }
+  }
+}
+</script>
 </head>
-
 <body>
-  <!-- Navigation -->
-  <nav class="navbar">
-    <div class="navbar-container">
-      <div class="navbar-brand">
-        <span class="brand-text">Mbulaheni Group</span>
+<a class="skip" href="#overview">Skip to content</a>
+
+<header class="site-header">
+  <div class="container nav">
+    <a href="index.html" class="brand" aria-label="Mbulaheni Group home">
+      <img src="assets/images/MG_icon.png" alt="" width="52" height="52">
+      <div class="brand-name"><b>Mbulaheni</b> Group
+        <span>Solutions · Built to Last</span>
       </div>
-      
-      <button class="nav-toggle" id="navToggle">
-        <i class="fas fa-bars"></i>
-      </button>
-      
-      <ul class="nav-menu" id="navMenu">
-        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="index.html#about">About</a></li>
-        <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
-        <li class="nav-item"><a class="nav-link" href="contact.html">Contact Us</a></li>
+    </a>
+    <nav aria-label="Main">
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html#about">About</a></li>
+        <li><a href="index.html#services">Services</a></li>
+        <li><a href="index.html#why">Why Us</a></li>
+        <li><a href="#enquiry">Contact</a></li>
       </ul>
-    </div>
-  </nav>
+    </nav>
+    <a href="#enquiry" class="btn btn-primary btn-arrow">Get a Quote</a>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
 
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="hero-content">
-      <h1 class="hero-title">Civil Engineering & Infrastructure Development</h1>
-      <p class="hero-subtitle">Expert oversight of construction, infrastructure development, and roadworks across South Africa.</p>
-      <div class="hero-buttons">
-        <a href="#services" class="btn btn-primary">Our Services</a>
-        <a href="#contact" class="btn btn-outline">Get In Touch</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Intro Section -->
-  <section class="intro">
-    <div class="container">
-      <div class="intro-content fade-in">
-        <h2 class="section-title">Professional Civil Engineering Solutions in South Africa</h2>
-        <p class="intro-text">Mbulaheni Group provides comprehensive civil engineering services across South Africa, delivering infrastructure solutions that meet the highest standards of quality and safety. Our experienced team of engineers and project managers ensures that every project is completed on time, within budget, and to specification.</p>
-        
-        <p class="intro-text">We specialize in:</p>
-        <ul class="feature-list">
-          <li><i class="fas fa-check-circle"></i> <strong>Infrastructure Development:</strong> Designing and constructing public and private infrastructure projects</li>
-          <li><i class="fas fa-check-circle"></i> <strong>Road Construction:</strong> Building and maintaining national, municipal, and rural road networks</li>
-          <li><i class="fas fa-check-circle"></i> <strong>Construction Management:</strong> Expert oversight from project conception to completion</li>
-          <li><i class="fas fa-check-circle"></i> <strong>Equipment Solutions:</strong> Providing specialized plant and equipment for construction projects</li>
-        </ul>
-        
-        <p class="intro-text">With years of experience serving clients throughout South Africa, we understand the unique challenges of construction in diverse environments and are committed to delivering exceptional results.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Services Section -->
-  <section id="services" class="services">
-    <div class="container">
-      <h2 class="section-title">Comprehensive Civil Engineering Services</h2>
-      <p class="text-center mb-5">Expert oversight of construction projects from start to finish</p>
-      
-      <div class="services-grid">
-        <!-- Infrastructure Development -->
-        <div class="service-card fade-in">
-          <div class="service-icon">
-            <i class="fas fa-road"></i>
-          </div>
-          <div class="service-content">
-            <h3 class="service-title">Infrastructure Development and Construction</h3>
-            <p>Design and development of public and private infrastructure projects across South Africa, ensuring compliance with local regulations and international standards.</p>
-            <ul>
-              <li>Public infrastructure projects</li>
-              <li>Private development</li>
-              <li>Regulatory compliance</li>
-              <li>Quality assurance</li>
-            </ul>
-          </div>
-        </div>
-
-        <!-- Construction Solutions -->
-        <div class="service-card fade-in">
-          <div class="service-icon">
-            <i class="fas fa-hard-hat"></i>
-          </div>
-          <div class="service-content">
-            <h3 class="service-title">Civil Engineered Construction Solutions</h3>
-            <p>Expert oversight of construction projects from start to finish, providing innovative engineering solutions for complex challenges in the South African context.</p>
-            <ul>
-              <li>Project management</li>
-              <li>Engineering solutions</li>
-              <li>Quality control</li>
-              <li>Timely delivery</li>
-            </ul>
-          </div>
-        </div>
-
-        <!-- Road Works -->
-        <div class="service-card fade-in">
-          <div class="service-icon">
-            <i class="fas fa-truck-pickup"></i>
-          </div>
-          <div class="service-content">
-            <h3 class="service-title">Road Works</h3>
-            <p>Construction and maintenance of National Roads, municipal Roads and rural Roads (including gravel) throughout South Africa.</p>
-            <ul>
-              <li>National road construction</li>
-              <li>Municipal road maintenance</li>
-              <li>Rural road development</li>
-              <li>Gravel road solutions</li>
-            </ul>
-          </div>
-        </div>
-
-        <!-- Plant and Equipment -->
-        <div class="service-card fade-in">
-          <div class="service-icon">
-            <i class="fas fa-tools"></i>
-          </div>
-          <div class="service-content">
-            <h3 class="service-title">Plant and Equipment Hire</h3>
-            <p>Comprehensive equipment solutions including Load & Haul and terracing equipment for construction projects across South Africa.</p>
-            <ul>
-              <li>Equipment rental</li>
-              <li>Load & haul solutions</li>
-              <li>Terracing equipment</li>
-              <li>Maintenance services</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Why Choose Us Section -->
-  <section class="features">
-    <div class="container">
-      <h2 class="section-title">Why Choose Our Civil Engineering Services?</h2>
-      
-      <div class="features-grid">
-        <div class="feature-item fade-in">
-          <div class="feature-icon">
-            <i class="fas fa-certificate"></i>
-          </div>
-          <h3>Certified Expertise</h3>
-          <p>Our team holds industry certifications and follows international engineering standards.</p>
-        </div>
-        
-        <div class="feature-item fade-in">
-          <div class="feature-icon">
-            <i class="fas fa-map-marked-alt"></i>
-          </div>
-          <h3>Nationwide Coverage</h3>
-          <p>Serving clients across South Africa with local expertise in diverse environments.</p>
-        </div>
-        
-        <div class="feature-item fade-in">
-          <div class="feature-icon">
-            <i class="fas fa-clock"></i>
-          </div>
-          <h3>Timely Delivery</h3>
-          <p>We pride ourselves on completing projects on schedule and within budget.</p>
-        </div>
-        
-        <div class="feature-item fade-in">
-          <div class="feature-icon">
-            <i class="fas fa-safety-first"></i>
-          </div>
-          <h3>Safety First</h3>
-          <p>Rigorous safety protocols to protect our team, clients, and the public.</p>
-        </div>
-        
-        <div class="feature-item fade-in">
-          <div class="feature-icon">
-            <i class="fas fa-handshake"></i>
-          </div>
-          <h3>Client Partnership</h3>
-          <p>We work closely with clients to understand their unique needs and challenges.</p>
-        </div>
-        
-        <div class="feature-item fade-in">
-          <div class="feature-icon">
-            <i class="fas fa-leaf"></i>
-          </div>
-          <h3>Sustainable Practices</h3>
-          <p>Environmentally conscious construction methods and materials.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CTA Section -->
-<section class="cta">
+<main>
+<section class="page-hero">
   <div class="container">
-    <h2 class="cta-title">Ready to Start Your Construction Project?</h2>
-    <p class="cta-text">
-      Get in touch with our civil engineering experts today for a free consultation 
-      and discover how we can help bring your infrastructure project to life.
-    </p>
-    <!-- Updated link to contact page -->
-    <a href="contact.html" class="btn btn-primary">Schedule a Consultation</a>
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <a href="index.html">Home</a><span aria-hidden="true">/</span>
+      <a href="index.html#services">Divisions</a><span aria-hidden="true">/</span>
+      <span>Civil Engineering</span>
+    </nav>
+    <div class="page-hero-grid">
+      <div>
+        <span class="eyebrow">Civil Engineering</span>
+        <h1>Infrastructure <em>built to last.</em></h1>
+        <p class="lead">Construction, infrastructure development, project management and consulting for public and private sector clients.</p>
+        <div class="hero-actions">
+          <a href="#enquiry" class="btn btn-primary btn-arrow">Request a Quote</a>
+          <a href="#capabilities" class="btn btn-outline">What We Deliver</a>
+        </div>
+      </div>
+      <div class="panel-wrap">
+        <div class="hero-panel">
+          <div class="service-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg></div>
+          <div class="panel-label">A division of</div>
+          <div class="panel-title">Mbulaheni Group</div>
+          <ul class="check-list">
+            <li>Level 1 B-BBEE contributor</li>
+            <li>100% black-owned, established 2015</li>
+            <li>Headquartered in Polokwane, Limpopo</li>
+            <li>Serving government, corporate and residential clients</li>
+          </ul>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
-
-  <!-- Footer -->
-  <footer>
-    <div class="container">
-      <div class="footer-grid">
-        <div>
-          <div class="footer-brand">
-            <span class="brand-text" style="color: white;">Mbulaheni Group</span>
-          </div>
-          <p>Providing comprehensive civil engineering and construction solutions to businesses across South Africa since 2015.</p>
-          <div class="social-links">
-            <a href="#"><i class="fab fa-facebook-f"></i></a>
-            <a href="#"><i class="fab fa-twitter"></i></a>
-            <a href="#"><i class="fab fa-linkedin-in"></i></a>
-            <a href="#"><i class="fab fa-instagram"></i></a>
-          </div>
-        </div>
-        
-        <div>
-          <h4 class="footer-title">Services</h4>
-          <ul class="footer-links">
-            <li><a href="MbulaheniGroup-IT.html">Managed IT Services</a></li>
-            <li><a href="Mbulahenigroup-Cleaning.html">Cleaning Services</a></li>
-            <li><a href="Mbulahenigroup-Fuel.html">Fuel Supply</a></li>
-            <li><a href="civil-engineering-services-south-africa.html">Civil Engineering</a></li>
-            <li><a href="mbulahenigroup-security.html">Security Services</a></li>
-          </ul>
-        </div>
-        
-        <div>
-          <h4 class="footer-title">Quick Links</h4>
-          <ul class="footer-links">
-            <li><a href="index.html">Home</a></li>
-            <li><a href="index.html#about">About Us</a></li>
-            <li><a href="#services">Our Services</a></li>
-            <li><a href="contact.html">Contact Us</a></li>
-            <li><a href="careers.html">Careers</a></li>
-          </ul>
-        </div>
-        
-        <div>
-          <h4 class="footer-title">Contact Info</h4>
-          <ul class="contact-info">
-            <li><i class="fas fa-envelope"></i> <a href="mailto:info@mbulahenigroup.co.za">info@mbulahenigroup.co.za</a></li>
-            <li><i class="fas fa-phone"></i> <a href="tel:0870931138">087 093 1138</a></li>
-            <li><i class="fas fa-map-marker-alt"></i> Pretoria, South Africa</li>
-            <li><i class="fas fa-clock"></i> Mon-Fri: 8:00 AM - 5:00 PM</li>
-          </ul>
-        </div>
+<section class="section" id="overview">
+  <div class="container">
+    <div class="split">
+      <div>
+        <span class="eyebrow">Overview</span>
+        <h2>Engineering and construction for public and private clients.</h2>
+        <p>Our <strong>Civil Engineering</strong> division delivers construction, infrastructure development, project management and consulting to public and private sector clients.</p><p>It draws on the Group's record of delivering government work as both primary contractor and sub-contractor, and on the compliance documentation public procurement requires.</p>
       </div>
-      
-      <div class="footer-bottom">
-        <p>&copy; 2025 Mbulaheni Group. All Rights Reserved.</p>
+      <aside class="aside-box">
+        <h3>Who we work with</h3>
+        <ul class="check-list"><li>Government departments and public entities</li><li>Private sector businesses and corporates</li><li>Main contractors needing a sub-contractor</li><li>Residential estates and households</li></ul>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt" id="capabilities">
+  <div class="container">
+    <div class="section-head center">
+      <span class="eyebrow">What we deliver</span>
+      <h2>From the first consultation to the finished structure.</h2>
+    </div>
+    <div class="cap-grid"><article class="cap"><div class="tick"></div><h3>Construction</h3><p>Construction delivery for public and private sector projects.</p></article><article class="cap"><div class="tick"></div><h3>Infrastructure development</h3><p>Development of the infrastructure that businesses and communities depend on.</p></article><article class="cap"><div class="tick"></div><h3>Project management</h3><p>Managing programme, cost and delivery so projects finish compliant and on time.</p></article><article class="cap"><div class="tick"></div><h3>Consulting</h3><p>Engineering and project consulting for clients planning or reviewing a project.</p></article></div>
+  </div>
+</section>
+
+<section class="section" id="why">
+  <div class="container">
+    <div class="section-head center">
+      <span class="eyebrow">Why Mbulaheni</span>
+      <h2>Compliant, proven and accountable.</h2>
+    </div>
+    <div class="record">
+      <div>
+        <div class="tick"></div>
+        <h3>Level 1 B-BBEE</h3>
+        <p>The highest rating available, which helps clients maximise procurement points while supporting economic transformation.</p>
+      </div>
+      <div>
+        <div class="tick"></div>
+        <h3>Proven delivery</h3>
+        <p>Government projects completed as both primary contractor and sub-contractor, with on-time, compliant delivery and high client retention.</p>
+      </div>
+      <div>
+        <div class="tick"></div>
+        <h3>One accountable group</h3>
+        <p>Five divisions under one group, so clients deal with a single provider across IT, fuel, cleaning, civil engineering and security.</p>
       </div>
     </div>
-  </footer>v
 
-  <!-- Scripts -->
-  <script>
-    // Navbar scroll effect
-    window.addEventListener('scroll', function() {
-      const navbar = document.querySelector('.navbar');
-      if (window.scrollY > 50) {
-        navbar.classList.add('scrolled');
-      } else {
-        navbar.classList.remove('scrolled');
-      }
-    });
-    
-    // Mobile menu toggle
-    const navToggle = document.getElementById('navToggle');
-    const navMenu = document.getElementById('navMenu');
-    
-    navToggle.addEventListener('click', function() {
-      navMenu.classList.toggle('active');
-    });
-    
-    // Close menu when clicking on a link
-    const navLinks = document.querySelectorAll('.nav-link');
-    navLinks.forEach(link => {
-      link.addEventListener('click', () => {
-        navMenu.classList.remove('active');
-      });
-    });
-    
-    // Scroll animation
-    function checkScroll() {
-      const elements = document.querySelectorAll('.fade-in');
-      elements.forEach(element => {
-        const elementPosition = element.getBoundingClientRect().top;
-        const screenPosition = window.innerHeight / 1.3;
-        if (elementPosition < screenPosition) {
-          element.classList.add('visible');
-        }
-      });
-    }
-    
-    window.addEventListener('scroll', checkScroll);
-    window.addEventListener('load', checkScroll);
-  </script>
+    <div class="docs-band" style="margin-top:72px">
+      <div>
+        <span class="eyebrow">Tender and procurement ready</span>
+        <h2>Compliance documents on request.</h2>
+        <p>Everything your supplier onboarding or tender submission needs is available from our team.</p>
+        <a href="#enquiry" class="btn btn-primary btn-arrow">Request documents</a>
+      </div>
+      <ul class="check-list">
+        <li>Company registration</li>
+        <li>Tax clearance certificate</li>
+        <li>B-BBEE certificate (Level 1 contributor)</li>
+        <li>Public procurement documentation</li>
+        <li>Professional indemnity insurance</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt" id="enquiry">
+  <div class="container">
+    <div class="contact-grid">
+      <div class="contact-info">
+        <span class="eyebrow">Get In Touch</span>
+        <h2>Tell us what you need.</h2>
+        <p>Send us your requirements for Civil Engineering and our team will respond within one business day.</p>
+
+        <div class="contact-detail">
+          <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1"/><path d="M3 7l9 6 9-6"/></svg></div>
+          <div>
+            <div class="label">Email</div>
+            <div class="value"><a href="mailto:info@mbulahenigroup.co.za">info@mbulahenigroup.co.za</a></div>
+          </div>
+        </div>
+        <div class="contact-detail">
+          <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg></div>
+          <div>
+            <div class="label">Phone</div>
+            <div class="value"><a href="tel:+27870931138">087 093 1138</a></div>
+          </div>
+        </div>
+        <div class="contact-detail">
+          <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M13 3L5 14h6l-1 7 8-11h-6l1-7z"/></svg></div>
+          <div>
+            <div class="label">Emergency</div>
+            <div class="value"><a href="tel:+27737335518">073 733 5518</a></div>
+          </div>
+        </div>
+        <div class="contact-detail">
+          <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+          <div>
+            <div class="label">Hours</div>
+            <div class="value">Mon – Fri · 08:00 – 17:00<br>Sat · 09:00 – 13:00</div>
+          </div>
+        </div>
+      </div>
+
+      <form class="contact-form" action="https://formspree.io/f/your-id" method="POST">
+        <input type="hidden" name="_subject" value="Website enquiry: Civil Engineering">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">Full Name</label>
+            <input id="name" name="name" type="text" autocomplete="name" required>
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="phone">Phone</label>
+            <input id="phone" name="phone" type="tel" autocomplete="tel">
+          </div>
+          <div class="form-group">
+            <label for="service">Service</label>
+            <select id="service" name="service" required>
+              <option value="">Select a division</option>
+              <option>Managed IT Services</option><option>Fuel Supply</option><option>Cleaning Services</option><option selected>Civil Engineering</option><option>Private Security</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="message">How can we help?</label>
+          <textarea id="message" name="message" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-arrow">Send Message</button>
+        <p class="form-note">We'll respond within one business day. Fields marked required.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head center" style="margin-bottom:48px">
+      <span class="eyebrow">Our Other Divisions</span>
+      <h2>One group, five divisions.</h2>
+    </div>
+    <div class="mini-grid"><a class="mini" href="https://cyberit.mbulahenigroup.co.za/" target="_blank" rel="noopener"><div class="service-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1"/><path d="M8 20h8M12 16v4"/></svg></div><h3>Managed IT Services</h3><span>Visit website</span></a><a class="mini" href="Mbulahenigroup-Fuel.html"><div class="service-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3c3.5 4.2 6 7.2 6 10.5A6 6 0 0 1 6 13.5C6 10.2 8.5 7.2 12 3z"/></svg></div><h3>Fuel Supply</h3><span>View division</span></a><a class="mini" href="Mbulahenigroup-Cleaning.html"><div class="service-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3z"/><path d="M18.5 15l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/></svg></div><h3>Cleaning Services</h3><span>View division</span></a><a class="mini" href="mbulahenigroup-security.html"><div class="service-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6l8-3z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></div><h3>Private Security</h3><span>View division</span></a></div>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <img src="assets/images/MG_logo_on_dark.png" alt="Mbulaheni Group" width="210" height="115">
+        <p>A Level 1 B-BBEE diversified South African group serving clients across
+           all nine provinces since 2015.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Services</h4>
+        <ul><li><a href="https://cyberit.mbulahenigroup.co.za/" target="_blank" rel="noopener">Managed IT</a></li><li><a href="Mbulahenigroup-Fuel.html">Fuel Supply</a></li><li><a href="Mbulahenigroup-Cleaning.html">Cleaning</a></li><li><a href="Mbulahenigroup-Civil.html">Civil Engineering</a></li><li><a href="mbulahenigroup-security.html">Private Security</a></li></ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="index.html#about">About</a></li>
+          <li><a href="index.html#why">Why Us</a></li>
+          <li><a href="projects.html">Projects</a></li>
+          <li><a href="#enquiry">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="mailto:info@mbulahenigroup.co.za">info@mbulahenigroup.co.za</a></li>
+          <li><a href="tel:+27870931138">087 093 1138</a></li>
+          <li><a href="tel:+27737335518">073 733 5518</a></li>
+          <li>Polokwane · Limpopo</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2026 Mbulaheni Group. All rights reserved.</div>
+      <div class="socials">
+        <a href="https://www.facebook.com/mbulahenigroup" aria-label="Facebook" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M14 8h3V4h-3a4 4 0 0 0-4 4v2H7v4h3v7h4v-7h3l1-4h-4V8.5c0-.3.2-.5.5-.5z"/></svg></a>
+        <a href="https://twitter.com/mbulahenigroup" aria-label="X (Twitter)" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M17.8 3h3.1l-6.8 7.7L22 21h-6.2l-4.9-6.4L5.3 21H2.2l7.3-8.3L2 3h6.4l4.4 5.8L17.8 3zm-1.1 16.2h1.7L7.3 4.7H5.5l11.2 14.5z"/></svg></a>
+        <a href="https://www.instagram.com/mbulahenigroup/" aria-label="Instagram" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M12 7.5A4.5 4.5 0 1 0 12 16.5 4.5 4.5 0 0 0 12 7.5zm0 7.4a2.9 2.9 0 1 1 0-5.8 2.9 2.9 0 0 1 0 5.8zM17 6a1.1 1.1 0 1 0 0 2.2A1.1 1.1 0 0 0 17 6zM16 2H8a6 6 0 0 0-6 6v8a6 6 0 0 0 6 6h8a6 6 0 0 0 6-6V8a6 6 0 0 0-6-6zm4 14a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v8z"/></svg></a>
+        <a href="https://www.linkedin.com/company/mbulahenigroup" aria-label="LinkedIn" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M4.5 3A1.9 1.9 0 1 0 4.5 6.8 1.9 1.9 0 0 0 4.5 3zM3 9h3v12H3zM9 9h2.9v1.7c.5-.9 1.7-2 3.6-2 3.4 0 4.5 2.1 4.5 5.3V21h-3v-6c0-1.5-.3-3-2.2-3s-2.8 1.3-2.8 3v6H9z"/></svg></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+var toggle = document.getElementById('navToggle');
+var links = document.getElementById('navLinks');
+toggle.addEventListener('click', function(){
+  var open = links.classList.toggle('open');
+  toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+});
+document.querySelectorAll('.nav-links a').forEach(function(a){
+  a.addEventListener('click', function(){
+    links.classList.remove('open');
+    toggle.setAttribute('aria-expanded', 'false');
+  });
+});
+</script>
 </body>
 </html>
